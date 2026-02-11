@@ -1,0 +1,17 @@
+@use "variables";
+
+@mixin grid-col($prefix) {
+  @for $i from 0 to 6 {
+    .col#{$prefix}-#{$i} {
+      grid-column-end: span $i;
+    }
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(variables.$grid-columns-all, 1fr);
+  grid-template-rows: auto;
+}
+
+@include grid-col(variables.$screen-all);

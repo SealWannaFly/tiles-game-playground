@@ -1,0 +1,75 @@
+@use "variables";
+
+@mixin gap($prefix) {
+  @for $i from 0 to 16 {
+    .gap#{$prefix}-#{$i*4} {
+      gap: #{$i*4}px;
+    }
+  }
+}
+
+@mixin grid-gap($prefix) {
+  @for $i from 0 to 16 {
+    .grid-gap#{$prefix}-#{$i*4} {
+      grid-gap: #{$i*4}px;
+    }
+  }
+}
+
+@mixin margin($prefix) {
+  @for $i from 0 to 16 {
+    .mt#{$prefix}-#{$i*4} {
+      margin-top: #{$i*4}px;
+    }
+    .mr#{$prefix}-#{$i*4} {
+      margin-right: #{$i*4}px;
+    }
+    .mb#{$prefix}-#{$i*4} {
+      margin-bottom: #{$i*4}px;
+    }
+    .ml#{$prefix}-#{$i*4} {
+      margin-left: #{$i*4}px;
+    }
+  }
+}
+
+@mixin padding($prefix) {
+  @for $i from 0 to 16 {
+    .pt#{$prefix}-#{$i*4} {
+      margin-top: #{$i*4}px;
+    }
+    .pr#{$prefix}-#{$i*4} {
+      margin-right: #{$i*4}px;
+    }
+    .pb#{$prefix}-#{$i*4} {
+      margin-bottom: #{$i*4}px;
+    }
+    .pl#{$prefix}-#{$i*4} {
+      margin-left: #{$i*4}px;
+    }
+  }
+}
+
+@include gap(variables.$screen-all);
+@include grid-gap(variables.$screen-all);
+@include margin(variables.$screen-all);
+@include padding(variables.$screen-all);
+
+@include gap(variables.$screen-large);
+@include grid-gap(variables.$screen-large);
+@include margin(variables.$screen-large);
+@include padding(variables.$screen-large);
+
+@media all and (max-width: variables.$screen-medium-breakpoint) {
+  @include gap(variables.$screen-medium);
+  @include grid-gap(variables.$screen-medium);
+  @include margin(variables.$screen-medium);
+  @include padding(variables.$screen-medium);
+}
+
+@media all and (max-width: variables.$screen-small-breakpoint) {
+  @include gap(variables.$screen-small);
+  @include grid-gap(variables.$screen-small);
+  @include margin(variables.$screen-small);
+  @include padding(variables.$screen-small);
+}

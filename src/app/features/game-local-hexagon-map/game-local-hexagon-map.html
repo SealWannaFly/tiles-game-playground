@@ -1,0 +1,24 @@
+<div class="grid">
+  <div class="col-4">
+    <canvas
+      #gameLocalMap
+    >
+
+    </canvas>
+  </div>
+  <div class="col-2">
+    <form class="flex column gap-24" [formGroup]="form" (ngSubmit)="generateMap()">
+      <label class="flex justify-between align-center gap-8">
+        <p>Семечко</p>
+        <input type="text" formControlName="seed">
+      </label>
+
+      <label class="flex justify-between align-center gap-8">
+        <p>Размер</p>
+        <input type="number" formControlName="size">
+      </label>
+
+      <button type="submit">Сгенерировать</button>
+    </form>
+  </div>
+</div>

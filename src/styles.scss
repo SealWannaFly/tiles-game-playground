@@ -1,0 +1,8 @@
+@use "styles/sealwannafly-atomic-scss/flex";
+@use "styles/sealwannafly-atomic-scss/grid";
+@use "styles/sealwannafly-atomic-scss/offsets";
+
+.base-container {
+  max-width: 1366px;
+  margin: 0 auto;
+}
