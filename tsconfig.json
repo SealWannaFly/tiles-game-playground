@@ -4,6 +4,8 @@
   "compileOnSave": false,
   "compilerOptions": {
     "strict": true,
+    "strictPropertyInitialization":  false,
+    "useDefineForClassFields": false,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,

@@ -1,5 +1,5 @@
 import {Component, ElementRef, ViewChild} from '@angular/core';
-import {GameConfigService} from '../../services/game-config.service';
+import {GameConfigService} from '../../common/services/game-config.service';
 import {CommonBase} from '../../common/base/common.base';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 

@@ -1,11 +1,6 @@
-import {Component, EventEmitter, OnDestroy} from '@angular/core';
+import {Component, EventEmitter, Injectable, OnDestroy} from '@angular/core';
 
-@Component({
-  selector: 'common-base',
-  standalone: true,
-  template: '',
-  styles: ''
-})
+@Injectable()
 export class CommonBase implements OnDestroy {
   protected destroyed$ = new EventEmitter<void>();
 

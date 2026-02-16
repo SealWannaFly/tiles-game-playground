@@ -1,0 +1,20 @@
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Текстура травы -->
+    <pattern id="grassFull" patternUnits="userSpaceOnUse" width="16" height="16">
+      <rect width="16" height="16" fill="#7CB342" />
+      <line x1="3" y1="16" x2="5" y2="8" stroke="#5A8F2C" stroke-width="1.2" />
+      <line x1="8" y1="16" x2="10" y2="6" stroke="#5A8F2C" stroke-width="1.2" />
+      <line x1="12" y1="16" x2="14" y2="10" stroke="#5A8F2C" stroke-width="1.2" />
+      <line x1="5" y1="16" x2="7" y2="4" stroke="#8BC34A" stroke-width="1.5" />
+      <circle cx="4" cy="10" r="0.8" fill="#C5E1A5" />
+      <circle cx="11" cy="12" r="0.8" fill="#C5E1A5" />
+    </pattern>
+  </defs>
+
+  <!-- Правильный шестигранник, вписанный точно в границы 64x64 -->
+  <path d="M 32 0 L 60 16 L 60 48 L 32 64 L 4 48 L 4 16 Z"
+        fill="url(#grassFull)"
+        stroke="#2D5A27"
+        stroke-width="1" />
+</svg>
