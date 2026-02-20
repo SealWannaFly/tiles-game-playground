@@ -6,14 +6,14 @@ import { GlobalMapTerrain } from './enums/global-map-terrain.enum';
   providedIn: 'root',
 })
 export class GameGlobalMapService {
-  private readonly _size = signal(100);
+  private readonly _size = signal(5);
   private readonly _globalMap = signal<Map<string, GlobalMapHexagon>>(
     this.generateGlobalMap(this._size()),
   );
 
-  readonly size = computed(() => this._size());
-  readonly globalMap = computed(() => this._globalMap());
-  readonly globalMapDrawable = computed(() => Array.from(this._globalMap().values()));
+  readonly size = this._size.asReadonly();
+  readonly globalMap = this._globalMap.asReadonly();
+  readonly globalMapTilesArray = computed(() => Array.from(this._globalMap().values()));
 
   setSize(size: number): void {
     this._size.set(size);

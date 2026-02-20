@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, signal } from '@angular/core';
 import { LoadingStatus } from '../interfaces/loading-status.interface';
 import { map, Observable, tap } from 'rxjs';
+import { blobToImageElement } from '../utils/blob-to-image-element.util';
 
 @Injectable({
   providedIn: 'root',
@@ -28,7 +29,7 @@ export class GameImagesLoaderService {
         responseType: 'blob',
       })
       .pipe(
-        map((svgText) => this.svgToImage(svgText)),
+        map((svgText) => blobToImageElement(svgText)),
         tap((image) => {
           this._imageCache.set(key, image);
 
@@ -39,14 +40,5 @@ export class GameImagesLoaderService {
 
   clearCache(): void {
     this._imageCache.clear();
-  }
-
-  private svgToImage(blob: Blob): HTMLImageElement {
-    const blobUrl = URL.createObjectURL(blob);
-
-    const img = new Image();
-    img.src = blobUrl;
-
-    return img;
   }
 }

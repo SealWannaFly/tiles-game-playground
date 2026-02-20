@@ -1,4 +1,4 @@
-import { Component, computed, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, computed, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { GameConfigService } from '../../common/services/game-config.service';
 import { CommonBase } from '../../common/base/common.base';
@@ -19,17 +19,15 @@ export class GameGlobalMap extends CommonBase implements OnInit {
   @ViewChild('gameGlobalMap') canvasRef!: ElementRef<HTMLCanvasElement>;
 
   readonly seed = this.gameConfigService.seed;
-  readonly globalMapDrawable = this.gameGlobalMapService.globalMapDrawable;
+  readonly globalMapDrawable = this.gameGlobalMapService.globalMapTilesArray;
 
-  readonly canvasWidth = computed(() => this.gameGlobalMapService.size() * 64);
-  readonly canvasHeight = computed(() => this.gameGlobalMapService.size() * 64);
   readonly hexR: number = 32;
 
-  // Параметры для шестигранников (для axial coordinates)
+  readonly canvasWidth = computed(() => this.gameGlobalMapService.size() * this.hexR * 2);
+  readonly canvasHeight = computed(() => this.gameGlobalMapService.size() * this.hexR * 2);
+
   private readonly HEX_WIDTH = 64;
   private readonly HEX_HEIGHT = 64;
-  private readonly HEX_HORIZONTAL_SPACING = this.HEX_WIDTH * 0.75; // 48px
-  private readonly HEX_VERTICAL_SPACING = this.HEX_HEIGHT; // 64px
 
   readonly form: FormGroup;
 
@@ -47,20 +45,16 @@ export class GameGlobalMap extends CommonBase implements OnInit {
   }
 
   ngOnInit(): void {
-    this.gameImagesLoaderService
-      .loadImage(GlobalMapTerrain.GRASS, '/assets/terrain/grass-terrain.svg')
-      .pipe(takeUntil(this.destroyed$))
-      .subscribe();
+    this.gameConfigService.loadTerrains().pipe(takeUntil(this.destroyed$)).subscribe();
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: Event) {
+    this.drawHexMap();
   }
 
   generateMap(): void {
-    console.log('params = ', this.form.value);
-
     if (this.form.valid) {
-      console.log('seed = ', this.form.value.seed);
-      console.log('seed in numbers = ', this.gameConfigService.numericSeed());
-      console.log('size = ', this.form.value.size);
-
       this.gameGlobalMapService.setSize(this.form.value.size);
     }
   }
@@ -74,8 +68,6 @@ export class GameGlobalMap extends CommonBase implements OnInit {
     if (!ctx) return;
 
     ctx.clearRect(0, 0, this.canvasWidth(), this.canvasHeight());
-
-    console.log('');
 
     this.globalMapDrawable().forEach((el) => {
       ctx.fillText(
@@ -98,10 +90,21 @@ export class GameGlobalMap extends CommonBase implements OnInit {
     x: number,
     y: number,
     image: HTMLImageElement,
+    canvasRef = this.canvasRef,
   ): void {
     ctx.save();
 
-    ctx.drawImage(image, x, y, this.HEX_WIDTH, this.HEX_HEIGHT);
+    ctx.scale(5, 5);
+
+    var img = new Image();
+
+    img.onload = function () {
+      ctx.drawImage(img, x, y);
+    };
+
+    img.src = `/assets/terrain/grass-terrain.svg?t=${Date.now()}`;
+
+    // ctx.drawImage(image, x, y, this.HEX_WIDTH, this.HEX_HEIGHT);
 
     ctx.fillText(`${x}:${y}`, x, y + 16);
 
