@@ -3,10 +3,9 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { GameConfigService } from '../../common/services/game-config.service';
 import { CommonBase } from '../../common/base/common.base';
 import { GameGlobalMapService } from './services/game-global-map.service';
-import { GlobalMapTerrain } from './services/enums/global-map-terrain.enum';
-import { GameImagesLoaderService } from '../../common/services/game-images-loader.service';
 import { takeUntil } from 'rxjs';
-import { isOdd } from '../../common/utils/is-odd.util';
+import { GlobalMapTile } from './services/interfaces/global-map-tile.interface';
+import { SpriteSheetLoaderService } from '../../common/services/game-sprite-sheet-loader/sprite-sheet-loader.service';
 
 @Component({
   selector: 'app-game-global-map',
@@ -21,13 +20,10 @@ export class GameGlobalMap extends CommonBase implements OnInit {
   readonly seed = this.gameConfigService.seed;
   readonly globalMapDrawable = this.gameGlobalMapService.globalMapTilesArray;
 
-  readonly hexR: number = 32;
+  readonly tileSize: number = 64;
 
-  readonly canvasWidth = computed(() => this.gameGlobalMapService.size() * this.hexR * 2);
-  readonly canvasHeight = computed(() => this.gameGlobalMapService.size() * this.hexR * 2);
-
-  private readonly HEX_WIDTH = 64;
-  private readonly HEX_HEIGHT = 64;
+  readonly canvasWidth = computed(() => this.gameGlobalMapService.size() * this.tileSize);
+  readonly canvasHeight = computed(() => this.gameGlobalMapService.size() * this.tileSize);
 
   readonly form: FormGroup;
 
@@ -35,7 +31,7 @@ export class GameGlobalMap extends CommonBase implements OnInit {
     private readonly fb: FormBuilder,
     private readonly gameConfigService: GameConfigService,
     private readonly gameGlobalMapService: GameGlobalMapService,
-    private readonly gameImagesLoaderService: GameImagesLoaderService,
+    private readonly spriteSheetLoaderService: SpriteSheetLoaderService,
   ) {
     super();
 
@@ -48,8 +44,8 @@ export class GameGlobalMap extends CommonBase implements OnInit {
     this.gameConfigService.loadTerrains().pipe(takeUntil(this.destroyed$)).subscribe();
   }
 
-  @HostListener('window:resize', ['$event'])
-  onResize(event: Event) {
+  @HostListener('window:resize')
+  onResize() {
     this.drawHexMap();
   }
 
@@ -60,8 +56,6 @@ export class GameGlobalMap extends CommonBase implements OnInit {
   }
 
   drawHexMap(): void {
-    if (!this.gameImagesLoaderService.getImage(GlobalMapTerrain.GRASS)) return;
-
     const canvas = this.canvasRef.nativeElement;
     const ctx = canvas.getContext('2d');
 
@@ -69,45 +63,34 @@ export class GameGlobalMap extends CommonBase implements OnInit {
 
     ctx.clearRect(0, 0, this.canvasWidth(), this.canvasHeight());
 
-    this.globalMapDrawable().forEach((el) => {
-      ctx.fillText(
-        `${el.x}:${el.y}`,
-        el.x * this.hexR * 2 + (isOdd(el.y) ? this.hexR : 0) - el.x * 6,
-        el.y * this.hexR * 1.5 + 8,
-      );
-
-      this.drawHexagon(
-        ctx,
-        el.x * this.hexR * 2 + (isOdd(el.y) ? this.hexR : 0) - el.x * 6,
-        el.y * this.hexR * 1.5,
-        this.gameImagesLoaderService.getImage(GlobalMapTerrain.GRASS)!,
-      );
+    this.globalMapDrawable().forEach((tile) => {
+      this.drawTile(ctx, tile, this.tileSize);
     });
   }
 
-  private drawHexagon(
-    ctx: CanvasRenderingContext2D,
-    x: number,
-    y: number,
-    image: HTMLImageElement,
-    canvasRef = this.canvasRef,
-  ): void {
-    ctx.save();
+  private drawTile(ctx: CanvasRenderingContext2D, tile: GlobalMapTile, tileSize: number): void {
+    const spriteSheet = this.spriteSheetLoaderService.getSpriteSheet('terrain');
 
-    ctx.scale(5, 5);
+    if (spriteSheet) {
+      const sprite = spriteSheet.getSprite(tile.terrain);
 
-    var img = new Image();
+      if (sprite) {
+        ctx.save();
 
-    img.onload = function () {
-      ctx.drawImage(img, x, y);
-    };
+        ctx.drawImage(
+          sprite.image,
+          sprite.region.x,
+          sprite.region.y,
+          sprite.region.width,
+          sprite.region.height,
+          tile.x * tileSize,
+          tile.y * tileSize,
+          tileSize,
+          tileSize,
+        );
 
-    img.src = `/assets/terrain/grass-terrain.svg?t=${Date.now()}`;
-
-    // ctx.drawImage(image, x, y, this.HEX_WIDTH, this.HEX_HEIGHT);
-
-    ctx.fillText(`${x}:${y}`, x, y + 16);
-
-    ctx.restore();
+        ctx.restore();
+      }
+    }
   }
 }

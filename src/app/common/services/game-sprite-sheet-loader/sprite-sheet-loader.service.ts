@@ -1,15 +1,27 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { SpriteSheetConfig } from './interfaces/sprite-sheet-config.interface';
-import { map, Observable } from 'rxjs';
-import { SpriteSheet } from './interfaces/sprite-sheet.interface';
+import { map, Observable, tap } from 'rxjs';
 import { blobToImageElement } from '../../utils/blob-to-image-element.util';
+import { SpriteSheet } from './classes/sprite-sheet.class';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SpriteSheetLoaderService {
+  private _spriteSheets = new Map<string, SpriteSheet>();
+
   constructor(private readonly http: HttpClient) {}
+
+  public getSpriteSheet(key: string): SpriteSheet | undefined {
+    const spriteSheet = this._spriteSheets.get(key);
+
+    if (!spriteSheet) {
+      console.error(`SpriteSheet ${key} not loaded`);
+    }
+
+    return spriteSheet;
+  }
 
   loadSpriteSheet(config: SpriteSheetConfig): Observable<SpriteSheet> {
     return this.http
@@ -18,10 +30,14 @@ export class SpriteSheetLoaderService {
       })
       .pipe(
         map((spriteSheet) => {
-          return {
-            image: blobToImageElement(spriteSheet),
-            sprites: new Map(config.sprites.map((item) => [item.key, item.region])),
-          } as SpriteSheet;
+          return new SpriteSheet(
+            config.key,
+            blobToImageElement(spriteSheet),
+            new Map(config.sprites.map((item) => [item.key, item.region])),
+          );
+        }),
+        tap((spriteSheet) => {
+          this._spriteSheets.set(config.key, spriteSheet);
         }),
       );
   }

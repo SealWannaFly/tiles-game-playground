@@ -1,5 +1,17 @@
 {
+  "terrains": [
+    {
+      "key": "water"
+    },
+    {
+      "key": "flatland"
+    },
+    {
+      "key": "mountains"
+    }
+  ],
   "spriteSheetConfig": {
+    "key": "terrain",
     "url": "/assets/terrain/terrain.png",
     "sprites": [
       {

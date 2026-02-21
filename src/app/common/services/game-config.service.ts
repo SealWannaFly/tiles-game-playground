@@ -1,16 +1,16 @@
 import { computed, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { SpriteSheetConfig } from './game-sprite-sheet-loader/interfaces/sprite-sheet-config.interface';
 import { Observable, switchMap, tap } from 'rxjs';
 import { SpriteSheetLoaderService } from './game-sprite-sheet-loader/sprite-sheet-loader.service';
-import { SpriteSheet } from './game-sprite-sheet-loader/interfaces/sprite-sheet.interface';
 import { TerrainsConfig } from '../interfaces/terrains-config.interface';
+import { SpriteSheet } from './game-sprite-sheet-loader/classes/sprite-sheet.class';
+import { SpriteSheetConfigBase } from '../interfaces/base/sprite-sheet-config-base.interface';
 
 @Injectable({
   providedIn: 'root',
 })
 export class GameConfigService {
-  readonly _terrains = signal<SpriteSheet | null>(null);
+  readonly terrains = signal<string[]>([]);
 
   readonly seed = signal('Hello, Milo! World is here!');
   readonly numericSeed = computed(() => this.seedToNumbers(this.seed()));
@@ -20,12 +20,24 @@ export class GameConfigService {
     private readonly spriteSheetLoaderService: SpriteSheetLoaderService,
   ) {}
 
+  public loadDefaults(): Observable<SpriteSheet> {
+    return this.http
+      .get<SpriteSheetConfigBase>('/assets/configs/default-sprite-sheet.config.json')
+      .pipe(
+        switchMap((defaultsSpriteSheetConfig) =>
+          this.spriteSheetLoaderService.loadSpriteSheet(
+            defaultsSpriteSheetConfig.spriteSheetConfig,
+          ),
+        ),
+      );
+  }
+
   public loadTerrains(): Observable<SpriteSheet> {
     return this.http.get<TerrainsConfig>('/assets/configs/terrain.config.json').pipe(
+      tap((terrainConfig) => this.terrains.set(terrainConfig.terrains.map((t) => t.key))),
       switchMap((terrainConfig) =>
         this.spriteSheetLoaderService.loadSpriteSheet(terrainConfig.spriteSheetConfig),
       ),
-      tap((terrains) => this._terrains.set(terrains)),
     );
   }
 

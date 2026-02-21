@@ -1,5 +1,9 @@
-import { SpriteSheetConfig } from '../services/game-sprite-sheet-loader/interfaces/sprite-sheet-config.interface';
+import { SpriteSheetConfigBase } from './base/sprite-sheet-config-base.interface';
 
-export class TerrainsConfig {
-  spriteSheetConfig: SpriteSheetConfig;
+export interface TerrainConfig {
+  key: string;
+}
+
+export interface TerrainsConfig extends SpriteSheetConfigBase {
+  terrains: TerrainConfig[];
 }
