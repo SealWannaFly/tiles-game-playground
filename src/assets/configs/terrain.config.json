@@ -1,21 +1,10 @@
 {
-  "terrains": [
-    {
-      "key": "water"
-    },
-    {
-      "key": "flatland"
-    },
-    {
-      "key": "mountains"
-    }
-  ],
   "spriteSheetConfig": {
-    "key": "terrain",
+    "key": "Terrain",
     "url": "/assets/terrain/terrain.png",
     "sprites": [
       {
-        "key": "water",
+        "key": "Shallow Water",
         "region": {
           "x": 1,
           "y": 1,
@@ -24,7 +13,7 @@
         }
       },
       {
-        "key": "flatland",
+        "key": "Intermediate Water",
         "region": {
           "x": 66,
           "y": 1,
@@ -33,10 +22,19 @@
         }
       },
       {
-        "key": "mountains",
+        "key": "Deep Water",
         "region": {
           "x": 131,
           "y": 1,
+          "width": 64,
+          "height": 64
+        }
+      },
+      {
+        "key": "Flat Land",
+        "region": {
+          "x": 1,
+          "y": 66,
           "width": 64,
           "height": 64
         }

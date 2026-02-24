@@ -1,0 +1,7 @@
+export enum GlobalMapGenerationStages {
+  EMPTY,
+  OCEAN_GENERATION,
+  OCEAN_GENERATED,
+  CONTINENTS_GENERATION,
+  CONTINENTS_GENERATED,
+}

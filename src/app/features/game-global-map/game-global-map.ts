@@ -36,7 +36,7 @@ export class GameGlobalMap extends CommonBase implements OnInit {
     super();
 
     this.form = this.fb.group({
-      size: [5, [Validators.required]],
+      size: [100, [Validators.required]],
     });
   }
 
@@ -69,7 +69,7 @@ export class GameGlobalMap extends CommonBase implements OnInit {
   }
 
   private drawTile(ctx: CanvasRenderingContext2D, tile: GlobalMapTile, tileSize: number): void {
-    const spriteSheet = this.spriteSheetLoaderService.getSpriteSheet('terrain');
+    const spriteSheet = this.spriteSheetLoaderService.getSpriteSheet('Terrain');
 
     if (spriteSheet) {
       const sprite = spriteSheet.getSprite(tile.terrain);
