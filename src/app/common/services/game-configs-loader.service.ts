@@ -9,10 +9,7 @@ import { SpriteSheetConfigBase } from '../interfaces/base/sprite-sheet-config-ba
 @Injectable({
   providedIn: 'root',
 })
-export class GameConfigService {
-  readonly seed = signal('Hello, Milo! World is here!');
-  readonly numericSeed = computed(() => this.seedToNumbers());
-
+export class GameConfigsLoaderService {
   constructor(
     private readonly http: HttpClient,
     private readonly spriteSheetLoaderService: SpriteSheetLoaderService,
@@ -38,28 +35,5 @@ export class GameConfigService {
           this.spriteSheetLoaderService.loadSpriteSheet(terrainConfig.spriteSheetConfig),
         ),
       );
-  }
-
-  public seedToNumbers(): number {
-    const numericString = Array.from(this.seed())
-      .map((char) => {
-        // Проверяем, является ли символ цифрой (0–9)
-        if (/\d/.test(char)) {
-          return char; // оставляем цифру как есть
-        } else {
-          return char.charCodeAt(0); // заменяем на код
-        }
-      })
-      .join('');
-
-    console.log('numericString = ', numericString);
-    console.log('numeric = ', +numericString.slice(0, 15));
-    console.log('');
-
-    return +numericString.slice(0, 15);
-  }
-
-  public getFromSeedInRange(a: number, b: number): number {
-    return Math.floor(a + (this.numericSeed() % (b - a + 1)));
   }
 }

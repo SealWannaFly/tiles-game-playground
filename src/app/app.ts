@@ -1,7 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CommonBase } from './common/base/common.base';
-import { GameConfigService } from './common/services/game-config.service';
+import { GameConfigsLoaderService } from './common/services/game-configs-loader.service';
 import { takeUntil } from 'rxjs';
 
 @Component({
@@ -14,7 +14,7 @@ import { takeUntil } from 'rxjs';
 export class App extends CommonBase implements OnInit {
   protected readonly title = signal('tiles-game-playground');
 
-  constructor(private readonly gameConfigService: GameConfigService) {
+  constructor(private readonly gameConfigService: GameConfigsLoaderService) {
     super();
   }
 

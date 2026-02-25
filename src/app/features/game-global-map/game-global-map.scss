@@ -1,8 +1,7 @@
 .global-map {
   canvas {
-    display: block; /* Убирает лишние отступы */
-    max-width: 100%;  /* Ширина не больше контейнера */
-    height: auto;     /* Высота подстроится пропорционально */
-    border: 1px solid #ccc; /* Для наглядности */
+    display: block;
+    max-height: 80vh;
+    border: 1px solid #ccc;
   }
 }

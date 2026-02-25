@@ -1,5 +1,5 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
-import { GameConfigService } from '../../common/services/game-config.service';
+import { GameConfigsLoaderService } from '../../common/services/game-configs-loader.service';
 import { CommonBase } from '../../common/base/common.base';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
@@ -17,7 +17,7 @@ export class GameLocalHexagonMap extends CommonBase {
 
   constructor(
     private readonly fb: FormBuilder,
-    private readonly gameConfigService: GameConfigService,
+    private readonly gameConfigService: GameConfigsLoaderService,
   ) {
     super();
 

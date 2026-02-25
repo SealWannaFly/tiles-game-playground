@@ -1,8 +1,8 @@
 import { computed, Injectable, signal } from '@angular/core';
 import { GlobalMapTile } from './interfaces/global-map-tile.interface';
-import { GameConfigService } from '../../../common/services/game-config.service';
 import { GlobalMapTerrains } from './enums/global-map-terrains.enum';
 import { GlobalMapGenerationStages } from './enums/global-map-generation-stages.enum';
+import { SeedService } from '../../../common/services/seed.service';
 
 @Injectable({
   providedIn: 'root',
@@ -22,7 +22,7 @@ export class GameGlobalMapService {
   readonly globalMap = this._globalMap.asReadonly();
   readonly globalMapTilesArray = computed(() => Array.from(this._globalMap().values()));
 
-  constructor(private readonly gameConfigService: GameConfigService) {}
+  constructor(private readonly seedService: SeedService) {}
 
   public setSize(size: number): void {
     this._size.set(size);
@@ -67,10 +67,36 @@ export class GameGlobalMapService {
     this._mapGenStage.set(GlobalMapGenerationStages.OCEAN_GENERATED);
   }
 
+  private getContinentsInfo() {
+    const continentsInfo = {
+      continentsCount: this.seedService.randomIntInRange(2, 5),
+      proportions: new Array<number>(),
+    };
+
+    for (let i = 0; i < continentsInfo.continentsCount; i++) {
+      continentsInfo.proportions.push(this.seedService.randomIntInRange(1, 10));
+    }
+
+    const sum = continentsInfo.proportions.reduce((sum: number, current: number) => {
+      sum += current;
+
+      return sum;
+    }, 0);
+
+    continentsInfo.proportions = continentsInfo.proportions.map((p) => p / sum);
+
+    return continentsInfo;
+  }
+
   private generateContinents(map: Map<string, GlobalMapTile>, size: number): void {
     this._mapGenStage.set(GlobalMapGenerationStages.CONTINENTS_GENERATION);
 
-    const continentsCount = this.gameConfigService.getFromSeedInRange(2, 5);
+    const { continentsCount, proportions } = this.getContinentsInfo();
+
+    console.log('Размер карты = ', `${size} x ${size}`);
+    console.log('Площадь суши = ', size * size * 0.65);
+    console.log('');
+
     console.log('continentsCount = ', continentsCount);
     console.log('');
 
@@ -82,8 +108,8 @@ export class GameGlobalMapService {
       let createdTilesQueue = [];
 
       while (!centerCreated) {
-        x = Math.floor(Math.random() * size);
-        y = Math.floor(Math.random() * size);
+        x = Math.floor(this.seedService.random() * size);
+        y = Math.floor(this.seedService.random() * size);
 
         if (map.get(this.getGlobalMapKey(x, y))?.terrain !== GlobalMapTerrains.FLAT_LAND) {
           map.get(this.getGlobalMapKey(x, y))!.terrain = GlobalMapTerrains.FLAT_LAND;
@@ -94,34 +120,68 @@ export class GameGlobalMapService {
         }
       }
 
+      const processTilesAround = (
+        centerX: number,
+        centerY: number,
+        radius: number,
+        callback: (x: number, y: number) => any,
+      ) => {
+        for (let x = centerX - radius; x <= centerX + radius; x++) {
+          for (let y = centerY - radius; y <= centerY + radius; y++) {
+            if (this.isCorrectCoordinates(x, y)) {
+              callback(x, y);
+            }
+          }
+        }
+      };
+
+      const setShallowWater = (x: number, y: number) => {
+        let neighborTile = map.get(this.getGlobalMapKey(x, y));
+
+        if (neighborTile!.terrain !== GlobalMapTerrains.FLAT_LAND) {
+          neighborTile!.terrain = GlobalMapTerrains.SHALLOW_WATER;
+        }
+      };
+
       const processNeighborTile = (x: number, y: number) => {
         if (!this.isCorrectCoordinates(x, y)) return false;
 
-        if (growthProbability > Math.random()) {
-          let newTile = map.get(this.getGlobalMapKey(x, y));
+        if (this.seedService.random() < 0.75) {
+          let neighborTile = map.get(this.getGlobalMapKey(x, y));
 
-          newTile!.terrain = GlobalMapTerrains.FLAT_LAND;
-          growthProbability *= 0.99;
+          if (neighborTile!.terrain !== GlobalMapTerrains.FLAT_LAND) {
+            neighborTile!.terrain = GlobalMapTerrains.FLAT_LAND;
 
-          createdTilesQueue.push(newTile);
+            processTilesAround(x, y, 1, setShallowWater);
 
-          return true;
+            continentsSize -= 1;
+
+            createdTilesQueue.push(neighborTile);
+
+            return true;
+          }
         }
+
         return false;
       };
 
-      let growthProbability = 1;
+      // 65% Суши на Земле
+      let continentsSize = Math.floor(proportions[continent] * size * size * 0.65);
 
-      while (growthProbability > 0.25 && createdTilesQueue.length > 0) {
+      console.log('continent №', continent + 1);
+      console.log('proportion = ', proportions[continent]);
+      console.log('continentsSize = ', continentsSize);
+
+      while (continentsSize > 0 && createdTilesQueue.length > 0) {
         const currentTile = createdTilesQueue.pop();
 
         if (currentTile) {
-          processNeighborTile(currentTile.x - 1, currentTile.y); // запад
-          processNeighborTile(currentTile.x + 1, currentTile.y); // восток
-          processNeighborTile(currentTile.x, currentTile.y - 1); // север
-          processNeighborTile(currentTile.x, currentTile.y + 1); // юг
+          processTilesAround(currentTile.x, currentTile.y, 1, processNeighborTile);
         }
       }
+
+      console.log('unused continentsSize = ', continentsSize);
+      console.log('');
     }
 
     this._mapGenStage.set(GlobalMapGenerationStages.CONTINENTS_GENERATED);
