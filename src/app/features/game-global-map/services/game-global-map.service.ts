@@ -94,11 +94,15 @@ export class GameGlobalMapService {
     const { continentsCount, proportions } = this.getContinentsInfo();
 
     console.log('Размер карты = ', `${size} x ${size}`);
-    console.log('Площадь суши = ', size * size * 0.65);
     console.log('');
 
     console.log('continentsCount = ', continentsCount);
     console.log('');
+
+    const minDistance = Math.floor(size / 2.5);
+    const centers: { x: number; y: number }[] = [];
+
+    const maxAttempts = 1000;
 
     for (let continent = 0; continent < continentsCount; continent++) {
       let x = -1;
@@ -107,15 +111,39 @@ export class GameGlobalMapService {
       let centerCreated = false;
       let createdTilesQueue = [];
 
-      while (!centerCreated) {
+      let attempts = 0;
+
+      while (!centerCreated && attempts < maxAttempts) {
         x = Math.floor(this.seedService.random() * size);
         y = Math.floor(this.seedService.random() * size);
 
-        if (map.get(this.getGlobalMapKey(x, y))?.terrain !== GlobalMapTerrains.FLAT_LAND) {
+        attempts++;
+
+        // Проверка расстояния до существующих центров
+        let tooClose = false;
+
+        for (const existingCenter of centers) {
+          const distance = Math.sqrt(
+            Math.pow(x - existingCenter.x, 2) + Math.pow(y - existingCenter.y, 2),
+          );
+
+          if (distance < minDistance) {
+            tooClose = true;
+            break;
+          }
+        }
+
+        if (
+          !tooClose &&
+          map.get(this.getGlobalMapKey(x, y))?.terrain !== GlobalMapTerrains.FLAT_LAND
+        ) {
           map.get(this.getGlobalMapKey(x, y))!.terrain = GlobalMapTerrains.FLAT_LAND;
+
+          console.log('Generated Center = ', this.getGlobalMapKey(x, y));
 
           createdTilesQueue.push(map.get(this.getGlobalMapKey(x, y)));
 
+          centers.push({ x, y });
           centerCreated = true;
         }
       }
@@ -143,20 +171,36 @@ export class GameGlobalMapService {
         }
       };
 
+      const setIntermediateWater = (x: number, y: number) => {
+        let neighborTile = map.get(this.getGlobalMapKey(x, y));
+
+        if (
+          neighborTile!.terrain !== GlobalMapTerrains.FLAT_LAND &&
+          neighborTile!.terrain !== GlobalMapTerrains.SHALLOW_WATER
+        ) {
+          neighborTile!.terrain = GlobalMapTerrains.INTERMEDIATE_WATER;
+        }
+      };
+
       const processNeighborTile = (x: number, y: number) => {
         if (!this.isCorrectCoordinates(x, y)) return false;
 
-        if (this.seedService.random() < 0.75) {
-          let neighborTile = map.get(this.getGlobalMapKey(x, y));
+        let neighborTile = map.get(this.getGlobalMapKey(x, y));
 
+        if (this.seedService.random() < 0.75) {
           if (neighborTile!.terrain !== GlobalMapTerrains.FLAT_LAND) {
             neighborTile!.terrain = GlobalMapTerrains.FLAT_LAND;
 
+            processTilesAround(x, y, 2, setIntermediateWater);
             processTilesAround(x, y, 1, setShallowWater);
 
             continentsSize -= 1;
 
-            createdTilesQueue.push(neighborTile);
+            const randomIndex = Math.floor(
+              this.seedService.random() * (createdTilesQueue.length + 1),
+            );
+
+            createdTilesQueue.splice(randomIndex, 0, neighborTile);
 
             return true;
           }
@@ -166,14 +210,16 @@ export class GameGlobalMapService {
       };
 
       // 65% Суши на Земле
-      let continentsSize = Math.floor(proportions[continent] * size * size * 0.65);
+      let continentsSize = Math.floor(proportions[continent] * size * size * 0.25);
 
       console.log('continent №', continent + 1);
       console.log('proportion = ', proportions[continent]);
       console.log('continentsSize = ', continentsSize);
 
       while (continentsSize > 0 && createdTilesQueue.length > 0) {
-        const currentTile = createdTilesQueue.pop();
+        const randomIndex = Math.floor(this.seedService.random() * createdTilesQueue.length);
+
+        const currentTile = createdTilesQueue.splice(randomIndex, 1).at(0);
 
         if (currentTile) {
           processTilesAround(currentTile.x, currentTile.y, 1, processNeighborTile);
