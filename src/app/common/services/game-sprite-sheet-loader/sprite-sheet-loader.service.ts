@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { SpriteSheetConfig } from './interfaces/sprite-sheet-config.interface';
 import { map, Observable, tap } from 'rxjs';
-import { blobToImageElement } from '../../utils/blob-to-image-element.util';
 import { SpriteSheet } from './classes/sprite-sheet.class';
+import { Utils } from '../../utils/utils';
 
 @Injectable({
   providedIn: 'root',
@@ -32,7 +32,7 @@ export class SpriteSheetLoaderService {
         map((spriteSheet) => {
           return new SpriteSheet(
             config.key,
-            blobToImageElement(spriteSheet),
+            Utils.blobToImageElement(spriteSheet),
             new Map(config.sprites.map((item) => [item.key, item.region])),
           );
         }),

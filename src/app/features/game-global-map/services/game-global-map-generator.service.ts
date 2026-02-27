@@ -3,11 +3,14 @@ import { GlobalMapTile } from './interfaces/global-map-tile.interface';
 import { GlobalMapTerrains } from './enums/global-map-terrains.enum';
 import { GlobalMapGenerationStages } from './enums/global-map-generation-stages.enum';
 import { SeedService } from '../../../common/services/seed.service';
+import { ContinentInfo } from './models/continent-info.model';
+import { Coordinate } from '../../../common/interfaces/coordinate.interface';
+import { Utils } from '../../../common/utils/utils';
 
 @Injectable({
   providedIn: 'root',
 })
-export class GameGlobalMapService {
+export class GameGlobalMapGeneratorService {
   private readonly _size = signal(100);
   readonly size = this._size.asReadonly();
 
@@ -29,18 +32,6 @@ export class GameGlobalMapService {
     this._globalMap.set(this.generateGlobalMap(this._size()));
   }
 
-  public getGlobalMapKey(x: number, y: number): string {
-    return `${x}:${y}`;
-  }
-
-  public isCorrectCoordinate(coordinate: number): boolean {
-    return coordinate > -1 && coordinate < this.size();
-  }
-
-  public isCorrectCoordinates(x: number, y: number): boolean {
-    return this.isCorrectCoordinate(x) && this.isCorrectCoordinate(y);
-  }
-
   private generateGlobalMap(size: number): Map<string, GlobalMapTile> {
     const map = new Map<string, GlobalMapTile>();
 
@@ -56,7 +47,7 @@ export class GameGlobalMapService {
 
     for (let x = 0; x < size; x++) {
       for (let y = 0; y < size; y++) {
-        map.set(this.getGlobalMapKey(x, y), {
+        map.set(Utils.getKeyFromCoordinates({ x, y }), {
           x,
           y,
           terrain: GlobalMapTerrains.DEEP_WATER,
@@ -65,6 +56,64 @@ export class GameGlobalMapService {
     }
 
     this._mapGenStage.set(GlobalMapGenerationStages.OCEAN_GENERATED);
+  }
+
+  /**
+   * Функция генерации континентов
+   *
+   * @private
+   * @returns void
+   */
+  private generateContinentCenters(map: Map<string, GlobalMapTile>, globalMapSize: number): void {
+    const continentsInfo: ContinentInfo[] = [];
+
+    const count = this.seedService.randomIntInRange(3, 6);
+
+    for (let continent = 0; continent < count; continent++) {
+      const minDistance = Math.floor(globalMapSize / 2.5);
+      const maxAttempts = 1000;
+
+      let attempts = 0;
+      let centerCreated = false;
+
+      let createdTilesQueue = [];
+
+      while (!centerCreated && attempts < maxAttempts) {
+        const potentialRoot: Coordinate = {
+          x: Math.floor(this.seedService.random() * globalMapSize),
+          y: Math.floor(this.seedService.random() * globalMapSize),
+        };
+
+        attempts++;
+
+        // Проверка расстояния до существующих центров
+        let tooClose = false;
+
+        for (const existingContinent of continentsInfo) {
+          if (
+            !existingContinent.boundingBox.isPointFarFromBoundingBox(potentialRoot, minDistance)
+          ) {
+            tooClose = true;
+            break;
+          }
+        }
+
+        if (!tooClose) {
+          const newContinent = new ContinentInfo(
+            new GlobalMapTile(potentialRoot, GlobalMapTerrains.FLAT_LAND),
+          );
+
+          map.get(Utils.getKeyFromCoordinates(potentialRoot))!.terrain =
+            GlobalMapTerrains.FLAT_LAND;
+
+          console.log('Generated Center = ', Utils.getKeyFromCoordinates(potentialRoot));
+
+          createdTilesQueue.push(map.get(Utils.getKeyFromCoordinates(potentialRoot)));
+
+          centerCreated = true;
+        }
+      }
+    }
   }
 
   private getContinentsInfo() {
@@ -88,16 +137,52 @@ export class GameGlobalMapService {
     return continentsInfo;
   }
 
+  private setShallowWater = (coordinate: Coordinate, map: Map<string, GlobalMapTile>) => {
+    let neighborTile = map.get(Utils.getKeyFromCoordinates(coordinate));
+
+    if (neighborTile!.terrain !== GlobalMapTerrains.FLAT_LAND) {
+      neighborTile!.terrain = GlobalMapTerrains.SHALLOW_WATER;
+    }
+  };
+
+  private setIntermediateWater = (coordinate: Coordinate, map: Map<string, GlobalMapTile>) => {
+    let neighborTile = map.get(Utils.getKeyFromCoordinates(coordinate));
+
+    if (
+      neighborTile!.terrain !== GlobalMapTerrains.FLAT_LAND &&
+      neighborTile!.terrain !== GlobalMapTerrains.SHALLOW_WATER
+    ) {
+      neighborTile!.terrain = GlobalMapTerrains.INTERMEDIATE_WATER;
+    }
+  };
+
+  private processNeighborTile(coordinate: Coordinate, map: Map<string, GlobalMapTile>): void {
+    let neighborTile = map.get(Utils.getKeyFromCoordinates(coordinate));
+
+    if (neighborTile && this.seedService.random() < 0.75) {
+      if (neighborTile!.terrain !== GlobalMapTerrains.FLAT_LAND) {
+        neighborTile!.terrain = GlobalMapTerrains.FLAT_LAND;
+
+        Utils.processTilesAround(neighborTile, 2, mapSize, this.setIntermediateWater);
+        Utils.processTilesAround(neighborTile, 1, mapSize, this.setShallowWater);
+
+        continentsSize -= 1;
+
+        const randomIndex = Math.floor(this.seedService.random() * (createdTilesQueue.length + 1));
+
+        createdTilesQueue.splice(randomIndex, 0, neighborTile);
+
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   private generateContinents(map: Map<string, GlobalMapTile>, size: number): void {
     this._mapGenStage.set(GlobalMapGenerationStages.CONTINENTS_GENERATION);
 
     const { continentsCount, proportions } = this.getContinentsInfo();
-
-    console.log('Размер карты = ', `${size} x ${size}`);
-    console.log('');
-
-    console.log('continentsCount = ', continentsCount);
-    console.log('');
 
     const minDistance = Math.floor(size / 2.5);
     const centers: { x: number; y: number }[] = [];
@@ -135,81 +220,20 @@ export class GameGlobalMapService {
 
         if (
           !tooClose &&
-          map.get(this.getGlobalMapKey(x, y))?.terrain !== GlobalMapTerrains.FLAT_LAND
+          map.get(Utils.getKeyFromCoordinates({ x, y }))?.terrain !== GlobalMapTerrains.FLAT_LAND
         ) {
-          map.get(this.getGlobalMapKey(x, y))!.terrain = GlobalMapTerrains.FLAT_LAND;
+          map.get(Utils.getKeyFromCoordinates({ x, y }))!.terrain = GlobalMapTerrains.FLAT_LAND;
 
-          console.log('Generated Center = ', this.getGlobalMapKey(x, y));
+          console.log('Generated Center = ', Utils.getKeyFromCoordinates({ x, y }));
 
-          createdTilesQueue.push(map.get(this.getGlobalMapKey(x, y)));
+          createdTilesQueue.push(map.get(Utils.getKeyFromCoordinates({ x, y })));
 
           centers.push({ x, y });
           centerCreated = true;
         }
       }
 
-      const processTilesAround = (
-        centerX: number,
-        centerY: number,
-        radius: number,
-        callback: (x: number, y: number) => any,
-      ) => {
-        for (let x = centerX - radius; x <= centerX + radius; x++) {
-          for (let y = centerY - radius; y <= centerY + radius; y++) {
-            if (this.isCorrectCoordinates(x, y)) {
-              callback(x, y);
-            }
-          }
-        }
-      };
-
-      const setShallowWater = (x: number, y: number) => {
-        let neighborTile = map.get(this.getGlobalMapKey(x, y));
-
-        if (neighborTile!.terrain !== GlobalMapTerrains.FLAT_LAND) {
-          neighborTile!.terrain = GlobalMapTerrains.SHALLOW_WATER;
-        }
-      };
-
-      const setIntermediateWater = (x: number, y: number) => {
-        let neighborTile = map.get(this.getGlobalMapKey(x, y));
-
-        if (
-          neighborTile!.terrain !== GlobalMapTerrains.FLAT_LAND &&
-          neighborTile!.terrain !== GlobalMapTerrains.SHALLOW_WATER
-        ) {
-          neighborTile!.terrain = GlobalMapTerrains.INTERMEDIATE_WATER;
-        }
-      };
-
-      const processNeighborTile = (x: number, y: number) => {
-        if (!this.isCorrectCoordinates(x, y)) return false;
-
-        let neighborTile = map.get(this.getGlobalMapKey(x, y));
-
-        if (this.seedService.random() < 0.75) {
-          if (neighborTile!.terrain !== GlobalMapTerrains.FLAT_LAND) {
-            neighborTile!.terrain = GlobalMapTerrains.FLAT_LAND;
-
-            processTilesAround(x, y, 2, setIntermediateWater);
-            processTilesAround(x, y, 1, setShallowWater);
-
-            continentsSize -= 1;
-
-            const randomIndex = Math.floor(
-              this.seedService.random() * (createdTilesQueue.length + 1),
-            );
-
-            createdTilesQueue.splice(randomIndex, 0, neighborTile);
-
-            return true;
-          }
-        }
-
-        return false;
-      };
-
-      // 65% Суши на Земле
+      // 25% Суши на Земле
       let continentsSize = Math.floor(proportions[continent] * size * size * 0.25);
 
       console.log('continent №', continent + 1);
@@ -222,7 +246,7 @@ export class GameGlobalMapService {
         const currentTile = createdTilesQueue.splice(randomIndex, 1).at(0);
 
         if (currentTile) {
-          processTilesAround(currentTile.x, currentTile.y, 1, processNeighborTile);
+          Utils.processTilesAround(currentTile, 1, size, processNeighborTile);
         }
       }
 

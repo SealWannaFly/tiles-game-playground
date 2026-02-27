@@ -1,6 +1,6 @@
-export interface SpriteRegion {
-  x: number;
-  y: number;
+import { Coordinate } from '../../../interfaces/coordinate.interface';
+
+export interface SpriteRegion extends Coordinate {
   width: number;
   height: number;
 }

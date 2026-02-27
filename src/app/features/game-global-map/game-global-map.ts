@@ -2,7 +2,7 @@ import { Component, computed, ElementRef, HostListener, OnInit, ViewChild } from
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { GameConfigsLoaderService } from '../../common/services/game-configs-loader.service';
 import { CommonBase } from '../../common/base/common.base';
-import { GameGlobalMapService } from './services/game-global-map.service';
+import { GameGlobalMapGeneratorService } from './services/game-global-map-generator.service';
 import { takeUntil } from 'rxjs';
 import { GlobalMapTile } from './services/interfaces/global-map-tile.interface';
 import { SpriteSheetLoaderService } from '../../common/services/game-sprite-sheet-loader/sprite-sheet-loader.service';
@@ -32,7 +32,7 @@ export class GameGlobalMap extends CommonBase implements OnInit {
     private readonly fb: FormBuilder,
     private readonly seedService: SeedService,
     private readonly gameConfigService: GameConfigsLoaderService,
-    private readonly gameGlobalMapService: GameGlobalMapService,
+    private readonly gameGlobalMapService: GameGlobalMapGeneratorService,
     private readonly spriteSheetLoaderService: SpriteSheetLoaderService,
   ) {
     super();
