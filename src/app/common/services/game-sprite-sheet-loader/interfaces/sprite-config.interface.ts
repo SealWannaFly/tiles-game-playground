@@ -1,6 +1,6 @@
-import { Coordinate } from '../../../interfaces/coordinate.interface';
+import { Point } from '../../../models/point.class';
 
-export interface SpriteRegion extends Coordinate {
+export interface SpriteRegion extends Point {
   width: number;
   height: number;
 }

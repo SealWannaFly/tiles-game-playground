@@ -1,4 +1,4 @@
-import { Component, computed, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, signal, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { GameConfigsLoaderService } from '../../common/services/game-configs-loader.service';
 import { CommonBase } from '../../common/base/common.base';
@@ -18,13 +18,12 @@ import { SeedService } from '../../common/services/seed.service';
 export class GameGlobalMap extends CommonBase implements OnInit {
   @ViewChild('gameGlobalMap') canvasRef!: ElementRef<HTMLCanvasElement>;
 
-  readonly globalMapDrawable = this.gameGlobalMapService.globalMapTilesArray;
   readonly numericSeed = this.seedService.numericSeed;
 
   readonly tileSize: number = 64;
 
-  readonly canvasWidth = computed(() => this.gameGlobalMapService.size() * this.tileSize);
-  readonly canvasHeight = computed(() => this.gameGlobalMapService.size() * this.tileSize);
+  readonly canvasWidth = signal(0);
+  readonly canvasHeight = signal(0);
 
   readonly form: FormGroup;
 
@@ -55,7 +54,7 @@ export class GameGlobalMap extends CommonBase implements OnInit {
   generateMap(): void {
     if (this.form.valid) {
       this.seedService.setSeed(this.form.value.seed);
-      this.gameGlobalMapService.setSize(this.form.value.size);
+      this.gameGlobalMapService.generateGlobalMap(this.form.value.size);
     }
   }
 
@@ -65,9 +64,12 @@ export class GameGlobalMap extends CommonBase implements OnInit {
 
     if (!ctx) return;
 
+    this.canvasWidth.set(this.gameGlobalMapService.globalMap.size * this.tileSize);
+    this.canvasHeight.set(this.gameGlobalMapService.globalMap.size * this.tileSize);
+
     ctx.clearRect(0, 0, this.canvasWidth(), this.canvasHeight());
 
-    this.globalMapDrawable().forEach((tile) => {
+    this.gameGlobalMapService.globalMap.tiles.forEach((tile) => {
       this.drawTile(ctx, tile, this.tileSize);
     });
   }
@@ -87,8 +89,8 @@ export class GameGlobalMap extends CommonBase implements OnInit {
           sprite.region.y,
           sprite.region.width,
           sprite.region.height,
-          tile.x * tileSize,
-          tile.y * tileSize,
+          tile.point.x * tileSize,
+          tile.point.y * tileSize,
           tileSize,
           tileSize,
         );

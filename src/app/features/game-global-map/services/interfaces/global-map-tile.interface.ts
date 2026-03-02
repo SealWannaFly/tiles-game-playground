@@ -1,12 +1,12 @@
 import { GlobalMapTerrains } from '../enums/global-map-terrains.enum';
-import { Coordinate } from '../../../../common/interfaces/coordinate.interface';
+import { Point } from '../../../../common/models/point.class';
 
 export class GlobalMapTile {
-  public coordinate: Coordinate;
+  public point: Point;
   public terrain: GlobalMapTerrains;
 
-  constructor(coordinate: Coordinate, terrain: GlobalMapTerrains) {
-    this.coordinate = coordinate;
+  constructor(point: Point, terrain: GlobalMapTerrains) {
+    this.point = point;
     this.terrain = terrain;
   }
 }

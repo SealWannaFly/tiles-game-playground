@@ -1,41 +1,41 @@
-import { Coordinate, defaultCoordinate } from '../interfaces/coordinate.interface';
+import { Point } from './point.class';
 import { Utils } from '../utils/utils';
 
 export class BoundingBox {
-  private readonly _minCoordinate: Coordinate = defaultCoordinate;
-  private readonly _maxCoordinate: Coordinate = defaultCoordinate;
+  private readonly _minPoint: Point = new Point(-1, -1);
+  private readonly _maxPoint: Point = new Point(-1, -1);
 
-  constructor(coordinate: Coordinate) {
-    this._minCoordinate = coordinate;
-    this._maxCoordinate = coordinate;
+  constructor(point: Point) {
+    this._minPoint = point;
+    this._maxPoint = point;
   }
 
-  public update(coordinate: Coordinate): void {
+  public update(point: Point): void {
     // Обновляем максимальные значения
-    if (coordinate.x > this._maxCoordinate.x) {
-      this._maxCoordinate.x = coordinate.x;
+    if (point.x > this._maxPoint.x) {
+      this._maxPoint.x = point.x;
     }
 
-    if (coordinate.y > this._maxCoordinate.y) {
-      this._maxCoordinate.y = coordinate.y;
+    if (point.y > this._maxPoint.y) {
+      this._maxPoint.y = point.y;
     }
 
     // Обновляем минимальные значения
-    if (coordinate.x < this._minCoordinate.x) {
-      this._minCoordinate.x = coordinate.x;
+    if (point.x < this._minPoint.x) {
+      this._minPoint.x = point.x;
     }
 
-    if (coordinate.y < this._minCoordinate.y) {
-      this._minCoordinate.y = coordinate.y;
+    if (point.y < this._minPoint.y) {
+      this._minPoint.y = point.y;
     }
   }
 
-  public isPointFarFromBoundingBox(coordinate: Coordinate, minDistance: number): boolean {
-    const closest: Coordinate = {
-      x: Math.max(this._minCoordinate.x, Math.min(coordinate.x, this._maxCoordinate.x)),
-      y: Math.max(this._minCoordinate.y, Math.min(coordinate.y, this._maxCoordinate.y)),
-    };
+  public isPointFarFromBoundingBox(point: Point, minDistance: number): boolean {
+    const closest: Point = new Point(
+      Math.max(this._minPoint.x, Math.min(point.x, this._maxPoint.x)),
+      Math.max(this._minPoint.y, Math.min(point.y, this._maxPoint.y)),
+    );
 
-    return Utils.distance(coordinate, closest) > minDistance;
+    return Utils.distance(point, closest) > minDistance;
   }
 }
