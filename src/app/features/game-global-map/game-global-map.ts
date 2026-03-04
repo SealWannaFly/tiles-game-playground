@@ -7,6 +7,8 @@ import { takeUntil } from 'rxjs';
 import { GlobalMapTile } from './services/interfaces/global-map-tile.interface';
 import { SpriteSheetLoaderService } from '../../common/services/game-sprite-sheet-loader/sprite-sheet-loader.service';
 import { SeedService } from '../../common/services/seed.service';
+import { GlobalMap } from './services/models/global-map.model';
+import { Point } from '../../common/models/point.class';
 
 @Component({
   selector: 'app-game-global-map',
@@ -17,6 +19,7 @@ import { SeedService } from '../../common/services/seed.service';
 })
 export class GameGlobalMap extends CommonBase implements OnInit {
   @ViewChild('gameGlobalMap') canvasRef!: ElementRef<HTMLCanvasElement>;
+  private _globalMap: GlobalMap;
 
   readonly numericSeed = this.seedService.numericSeed;
 
@@ -26,6 +29,9 @@ export class GameGlobalMap extends CommonBase implements OnInit {
   readonly canvasHeight = signal(0);
 
   readonly form: FormGroup;
+
+  cx = 0;
+  cy = 0;
 
   constructor(
     private readonly fb: FormBuilder,
@@ -48,30 +54,40 @@ export class GameGlobalMap extends CommonBase implements OnInit {
 
   @HostListener('window:resize')
   onResize() {
-    this.drawHexMap();
+    this.drawMap();
   }
 
   generateMap(): void {
     if (this.form.valid) {
       this.seedService.setSeed(this.form.value.seed);
-      this.gameGlobalMapService.generateGlobalMap(this.form.value.size);
+      this._globalMap = this.gameGlobalMapService.generateGlobalMap(this.form.value.size);
     }
   }
 
-  drawHexMap(): void {
+  drawMap(): void {
     const canvas = this.canvasRef.nativeElement;
     const ctx = canvas.getContext('2d');
 
     if (!ctx) return;
 
-    this.canvasWidth.set(this.gameGlobalMapService.globalMap.size * this.tileSize);
-    this.canvasHeight.set(this.gameGlobalMapService.globalMap.size * this.tileSize);
+    this.canvasWidth.set(this._globalMap.size * this.tileSize);
+    this.canvasHeight.set(this._globalMap.size * this.tileSize);
 
     ctx.clearRect(0, 0, this.canvasWidth(), this.canvasHeight());
 
-    this.gameGlobalMapService.globalMap.tiles.forEach((tile) => {
+    ctx.save();
+
+    ctx.scale(this._globalMap.mapScale.scale, this._globalMap.mapScale.scale);
+    ctx.translate(
+      this._globalMap.mapScale.translationEnd.x - this._globalMap.mapScale.translationStart.x,
+      this._globalMap.mapScale.translationEnd.y - this._globalMap.mapScale.translationStart.y,
+    );
+
+    this._globalMap.tiles.forEach((tile) => {
       this.drawTile(ctx, tile, this.tileSize);
     });
+
+    ctx.restore();
   }
 
   private drawTile(ctx: CanvasRenderingContext2D, tile: GlobalMapTile, tileSize: number): void {
@@ -81,8 +97,6 @@ export class GameGlobalMap extends CommonBase implements OnInit {
       const sprite = spriteSheet.getSprite(tile.terrain);
 
       if (sprite) {
-        ctx.save();
-
         ctx.drawImage(
           sprite.image,
           sprite.region.x,
@@ -94,9 +108,42 @@ export class GameGlobalMap extends CommonBase implements OnInit {
           tileSize,
           tileSize,
         );
-
-        ctx.restore();
       }
     }
+  }
+
+  onCanvasWheel(wheelEvent: WheelEvent): void {
+    wheelEvent.preventDefault();
+
+    console.log('wheelEvent = ', wheelEvent);
+
+    this._globalMap.mapScale.scale = wheelEvent.deltaY;
+
+    this.drawMap();
+  }
+
+  onCanvasDragStart(dragEvent: DragEvent): void {
+    const rect = this.canvasRef.nativeElement.getBoundingClientRect();
+
+    this._globalMap.mapScale.translationStart = new Point(
+      ((dragEvent.clientX - rect.left) / rect.width) * this.canvasWidth(),
+      ((dragEvent.clientY - rect.top) / rect.height) * this.canvasHeight(),
+    );
+
+    console.log('translationStart = ', this._globalMap.mapScale.translationStart);
+  }
+
+  onCanvasDragEnd(dragEvent: DragEvent): void {
+    const rect = this.canvasRef.nativeElement.getBoundingClientRect();
+
+    this._globalMap.mapScale.translationEnd = new Point(
+      ((dragEvent.clientX - rect.left) / rect.width) * this.canvasWidth(),
+      ((dragEvent.clientY - rect.top) / rect.height) * this.canvasHeight(),
+    );
+
+    console.log('translationEnd = ', this._globalMap.mapScale.translationEnd);
+    console.log('');
+
+    this.drawMap();
   }
 }

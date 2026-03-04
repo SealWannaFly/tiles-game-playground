@@ -2,6 +2,7 @@ import { GlobalMapTile } from '../interfaces/global-map-tile.interface';
 import { ContinentInfo } from './continent-info.model';
 import { Point } from '../../../../common/models/point.class';
 import { GlobalMapTerrains } from '../enums/global-map-terrains.enum';
+import { MapScale } from '../../../../common/models/map-scale.class';
 
 export class GlobalMap {
   private readonly _size: number;
@@ -9,10 +10,13 @@ export class GlobalMap {
   private _tiles: Map<string, GlobalMapTile>;
   private _continents: Map<string, ContinentInfo>;
 
+  public readonly _mapScale: MapScale;
+
   constructor(size: number) {
     this._size = size;
     this._tiles = new Map<string, GlobalMapTile>();
     this._continents = new Map<string, ContinentInfo>();
+    this._mapScale = new MapScale(1, 5);
   }
 
   public get size() {
@@ -25,6 +29,10 @@ export class GlobalMap {
 
   public get tiles() {
     return Array.from(this._tiles.values());
+  }
+
+  public get mapScale() {
+    return this._mapScale;
   }
 
   public isCorrectCoordinate(coordinate: number): boolean {

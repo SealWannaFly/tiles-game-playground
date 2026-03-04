@@ -11,8 +11,6 @@ import { GlobalMap } from './models/global-map.model';
   providedIn: 'root',
 })
 export class GameGlobalMapGeneratorService {
-  private _globalMap: GlobalMap;
-
   private readonly _mapGenStage = signal<GlobalMapGenerationStages>(
     GlobalMapGenerationStages.EMPTY,
   );
@@ -20,17 +18,13 @@ export class GameGlobalMapGeneratorService {
 
   constructor(private readonly seedService: SeedService) {}
 
-  public get globalMap() {
-    return this._globalMap;
-  }
-
   public generateGlobalMap(size: number): GlobalMap {
-    this._globalMap = new GlobalMap(size);
+    const globalMap = new GlobalMap(size);
 
-    this.generateOcean(this._globalMap);
-    this.generateContinents(this._globalMap);
+    this.generateOcean(globalMap);
+    this.generateContinents(globalMap);
 
-    return this._globalMap;
+    return globalMap;
   }
 
   private generateOcean(map: GlobalMap): void {
@@ -47,10 +41,10 @@ export class GameGlobalMapGeneratorService {
     this._mapGenStage.set(GlobalMapGenerationStages.OCEAN_GENERATED);
   }
 
-  private getContinentsSize(map: GlobalMap, continentsCount: number) {
+  private getContinentsSize(map: GlobalMap) {
     const proportions = [];
 
-    for (let i = 0; i < continentsCount; i++) {
+    for (let i = 0; i < map.continents.length; i++) {
       proportions.push(this.seedService.randomIntInRange(1, 10));
     }
 
@@ -74,7 +68,6 @@ export class GameGlobalMapGeneratorService {
     this._mapGenStage.set(GlobalMapGenerationStages.CONTINENTS_GENERATION);
 
     const count = this.seedService.randomIntInRange(3, 6);
-    const continentSizes = this.getContinentsSize(map, count);
 
     for (let continent = 0; continent < count; continent++) {
       const minDistance = Math.floor(map.size / 2.5);
@@ -82,8 +75,6 @@ export class GameGlobalMapGeneratorService {
 
       let attempts = 0;
       let centerCreated = false;
-
-      const createdTilesQueue: Point[] = [];
 
       while (!centerCreated && attempts < maxAttempts) {
         const potentialRoot = new Point(
@@ -107,13 +98,16 @@ export class GameGlobalMapGeneratorService {
 
         if (!tooClose) {
           map.addContinent(potentialRoot, new ContinentInfo(potentialRoot));
-
-          createdTilesQueue.push(potentialRoot);
           centerCreated = true;
         }
       }
+    }
 
+    const continentSizes = this.getContinentsSize(map);
+
+    for (let continent = 0; continent < count; continent++) {
       let continentsSize = continentSizes[continent];
+      const createdTilesQueue: Point[] = [map.continents[continent].root];
 
       while (continentsSize > 0 && createdTilesQueue.length > 0) {
         const randomIndex = Math.floor(this.seedService.random() * createdTilesQueue.length);
@@ -144,10 +138,10 @@ export class GameGlobalMapGeneratorService {
         } else {
           break;
         }
-
-        console.log('');
       }
     }
+
+    console.log('Generated continents = ', map.continents.length);
 
     this._mapGenStage.set(GlobalMapGenerationStages.CONTINENTS_GENERATED);
   }

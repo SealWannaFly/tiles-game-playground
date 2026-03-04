@@ -5,6 +5,10 @@
         #gameGlobalMap
         [width]="canvasWidth()"
         [height]="canvasHeight()"
+        (wheel)="onCanvasWheel($event)"
+        draggable="true"
+        (dragstart)="onCanvasDragStart($event)"
+        (dragend)="onCanvasDragEnd($event)"
       >
       </canvas>
     </div>
@@ -28,6 +32,6 @@
 
       <button type="submit">Сгенерировать</button>
     </form>
-    <button class="mt-24" (click)="drawHexMap()">Нарисовать</button>
+    <button class="mt-24" (click)="drawMap()">Нарисовать</button>
   </div>
 </div>
