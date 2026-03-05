@@ -78,10 +78,7 @@ export class GameGlobalMap extends CommonBase implements OnInit {
     ctx.save();
 
     ctx.scale(this._globalMap.mapScale.scale, this._globalMap.mapScale.scale);
-    ctx.translate(
-      this._globalMap.mapScale.translationEnd.x - this._globalMap.mapScale.translationStart.x,
-      this._globalMap.mapScale.translationEnd.y - this._globalMap.mapScale.translationStart.y,
-    );
+    ctx.translate(this._globalMap.mapScale.translation.x, this._globalMap.mapScale.translation.y);
 
     this._globalMap.tiles.forEach((tile) => {
       this.drawTile(ctx, tile, this.tileSize);
@@ -115,35 +112,43 @@ export class GameGlobalMap extends CommonBase implements OnInit {
   onCanvasWheel(wheelEvent: WheelEvent): void {
     wheelEvent.preventDefault();
 
-    console.log('wheelEvent = ', wheelEvent);
-
     this._globalMap.mapScale.scale = wheelEvent.deltaY;
+
+    if (!this._globalMap.mapScale.scaleChanged) {
+      return;
+    }
+
+    const canvasPoint = this.clientToCanvasPoint(new Point(wheelEvent.clientX, wheelEvent.clientY));
+
+    this._globalMap.mapScale.translationStart = new Point(
+      canvasPoint.x * (this._globalMap.mapScale.scale / this._globalMap.mapScale.prevScale),
+      canvasPoint.y * (this._globalMap.mapScale.scale / this._globalMap.mapScale.prevScale),
+    );
+    this._globalMap.mapScale.translationEnd = new Point(canvasPoint.x, canvasPoint.y);
 
     this.drawMap();
   }
 
   onCanvasDragStart(dragEvent: DragEvent): void {
-    const rect = this.canvasRef.nativeElement.getBoundingClientRect();
-
-    this._globalMap.mapScale.translationStart = new Point(
-      ((dragEvent.clientX - rect.left) / rect.width) * this.canvasWidth(),
-      ((dragEvent.clientY - rect.top) / rect.height) * this.canvasHeight(),
+    this._globalMap.mapScale.translationStart = this.clientToCanvasPoint(
+      new Point(dragEvent.clientX, dragEvent.clientY),
     );
-
-    console.log('translationStart = ', this._globalMap.mapScale.translationStart);
   }
 
   onCanvasDragEnd(dragEvent: DragEvent): void {
-    const rect = this.canvasRef.nativeElement.getBoundingClientRect();
-
-    this._globalMap.mapScale.translationEnd = new Point(
-      ((dragEvent.clientX - rect.left) / rect.width) * this.canvasWidth(),
-      ((dragEvent.clientY - rect.top) / rect.height) * this.canvasHeight(),
+    this._globalMap.mapScale.translationEnd = this.clientToCanvasPoint(
+      new Point(dragEvent.clientX, dragEvent.clientY),
     );
 
-    console.log('translationEnd = ', this._globalMap.mapScale.translationEnd);
-    console.log('');
-
     this.drawMap();
+  }
+
+  clientToCanvasPoint(point: Point): Point {
+    const rect = this.canvasRef.nativeElement.getBoundingClientRect();
+
+    return new Point(
+      ((point.x - rect.left) / rect.width) * this.canvasWidth(),
+      ((point.y - rect.top) / rect.height) * this.canvasHeight(),
+    );
   }
 }
