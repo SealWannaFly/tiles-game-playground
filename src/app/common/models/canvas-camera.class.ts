@@ -1,6 +1,6 @@
 import { Point } from './point.class';
 
-export class MapScale {
+export class CanvasCamera {
   private _scale: number;
   private _prevScale: number;
 

@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, OnInit, signal, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { GameConfigsLoaderService } from '../../common/services/game-configs-loader.service';
 import { CommonBase } from '../../common/base/common.base';
@@ -21,17 +21,11 @@ export class GameGlobalMap extends CommonBase implements OnInit {
   @ViewChild('gameGlobalMap') canvasRef!: ElementRef<HTMLCanvasElement>;
   private _globalMap: GlobalMap;
 
+  public canvasSize: number;
+
   readonly numericSeed = this.seedService.numericSeed;
 
-  readonly tileSize: number = 64;
-
-  readonly canvasWidth = signal(0);
-  readonly canvasHeight = signal(0);
-
   readonly form: FormGroup;
-
-  cx = 0;
-  cy = 0;
 
   constructor(
     private readonly fb: FormBuilder,
@@ -60,7 +54,10 @@ export class GameGlobalMap extends CommonBase implements OnInit {
   generateMap(): void {
     if (this.form.valid) {
       this.seedService.setSeed(this.form.value.seed);
-      this._globalMap = this.gameGlobalMapService.generateGlobalMap(this.form.value.size);
+      this._globalMap = this.gameGlobalMapService.generateGlobalMap(this.form.value.size, 64);
+      this.canvasSize = this._globalMap.canvasSize;
+
+      this.drawMap();
     }
   }
 
@@ -70,18 +67,18 @@ export class GameGlobalMap extends CommonBase implements OnInit {
 
     if (!ctx) return;
 
-    this.canvasWidth.set(this._globalMap.size * this.tileSize);
-    this.canvasHeight.set(this._globalMap.size * this.tileSize);
-
-    ctx.clearRect(0, 0, this.canvasWidth(), this.canvasHeight());
+    ctx.clearRect(0, 0, this._globalMap.canvasSize, this._globalMap.canvasSize);
 
     ctx.save();
 
-    ctx.scale(this._globalMap.mapScale.scale, this._globalMap.mapScale.scale);
-    ctx.translate(this._globalMap.mapScale.translation.x, this._globalMap.mapScale.translation.y);
+    // Убирает белые полосы на стыке пикселей при scale
+    ctx.imageSmoothingEnabled = false;
+
+    ctx.scale(this._globalMap.camera.scale, this._globalMap.camera.scale);
+    ctx.translate(this._globalMap.camera.translation.x, this._globalMap.camera.translation.y);
 
     this._globalMap.tiles.forEach((tile) => {
-      this.drawTile(ctx, tile, this.tileSize);
+      this.drawTile(ctx, tile, this._globalMap.textureSize);
     });
 
     ctx.restore();
@@ -105,6 +102,24 @@ export class GameGlobalMap extends CommonBase implements OnInit {
           tileSize,
           tileSize,
         );
+
+        if (tile === this._globalMap.selectedTile) {
+          ctx.save();
+
+          const lineWidth = Math.trunc(this._globalMap.textureSize / 10);
+
+          ctx.strokeStyle = 'black';
+          ctx.lineWidth = lineWidth;
+
+          ctx.strokeRect(
+            tile.point.x * tileSize + lineWidth / 2,
+            tile.point.y * tileSize + lineWidth / 2,
+            tileSize - lineWidth,
+            tileSize - lineWidth,
+          );
+
+          ctx.restore();
+        }
       }
     }
   }
@@ -112,32 +127,40 @@ export class GameGlobalMap extends CommonBase implements OnInit {
   onCanvasWheel(wheelEvent: WheelEvent): void {
     wheelEvent.preventDefault();
 
-    this._globalMap.mapScale.scale = wheelEvent.deltaY;
+    this._globalMap.camera.scale = wheelEvent.deltaY;
 
-    if (!this._globalMap.mapScale.scaleChanged) {
+    if (!this._globalMap.camera.scaleChanged) {
       return;
     }
 
     const canvasPoint = this.clientToCanvasPoint(new Point(wheelEvent.clientX, wheelEvent.clientY));
 
-    this._globalMap.mapScale.translationStart = new Point(
-      canvasPoint.x * (this._globalMap.mapScale.scale / this._globalMap.mapScale.prevScale),
-      canvasPoint.y * (this._globalMap.mapScale.scale / this._globalMap.mapScale.prevScale),
+    this._globalMap.camera.translationStart = new Point(
+      canvasPoint.x * (this._globalMap.camera.scale / this._globalMap.camera.prevScale),
+      canvasPoint.y * (this._globalMap.camera.scale / this._globalMap.camera.prevScale),
     );
-    this._globalMap.mapScale.translationEnd = new Point(canvasPoint.x, canvasPoint.y);
+    this._globalMap.camera.translationEnd = new Point(canvasPoint.x, canvasPoint.y);
 
     this.drawMap();
   }
 
   onCanvasDragStart(dragEvent: DragEvent): void {
-    this._globalMap.mapScale.translationStart = this.clientToCanvasPoint(
+    this._globalMap.camera.translationStart = this.clientToCanvasPoint(
       new Point(dragEvent.clientX, dragEvent.clientY),
     );
   }
 
   onCanvasDragEnd(dragEvent: DragEvent): void {
-    this._globalMap.mapScale.translationEnd = this.clientToCanvasPoint(
+    this._globalMap.camera.translationEnd = this.clientToCanvasPoint(
       new Point(dragEvent.clientX, dragEvent.clientY),
+    );
+
+    this.drawMap();
+  }
+
+  onClick(pointerEvent: PointerEvent): void {
+    this._globalMap.selectedPoint = this.clientToCanvasPoint(
+      new Point(pointerEvent.clientX, pointerEvent.clientY),
     );
 
     this.drawMap();
@@ -147,8 +170,8 @@ export class GameGlobalMap extends CommonBase implements OnInit {
     const rect = this.canvasRef.nativeElement.getBoundingClientRect();
 
     return new Point(
-      ((point.x - rect.left) / rect.width) * this.canvasWidth(),
-      ((point.y - rect.top) / rect.height) * this.canvasHeight(),
+      Math.trunc(((point.x - rect.left) / rect.width) * this._globalMap.canvasSize),
+      Math.trunc(((point.y - rect.top) / rect.height) * this._globalMap.canvasSize),
     );
   }
 }

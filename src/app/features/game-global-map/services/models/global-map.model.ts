@@ -2,25 +2,40 @@ import { GlobalMapTile } from '../interfaces/global-map-tile.interface';
 import { ContinentInfo } from './continent-info.model';
 import { Point } from '../../../../common/models/point.class';
 import { GlobalMapTerrains } from '../enums/global-map-terrains.enum';
-import { MapScale } from '../../../../common/models/map-scale.class';
+import { CanvasCamera } from '../../../../common/models/canvas-camera.class';
 
 export class GlobalMap {
   private readonly _size: number;
+  private readonly _texturesSize: number;
 
   private _tiles: Map<string, GlobalMapTile>;
   private _continents: Map<string, ContinentInfo>;
 
-  public readonly _mapScale: MapScale;
+  private _selectedPoint: Point | null = null;
+  private _selectedTile: GlobalMapTile | null = null;
 
-  constructor(size: number) {
+  public readonly _camera: CanvasCamera;
+
+  constructor(size: number, texturesSize: number) {
     this._size = size;
+    this._texturesSize = texturesSize;
+
     this._tiles = new Map<string, GlobalMapTile>();
     this._continents = new Map<string, ContinentInfo>();
-    this._mapScale = new MapScale(1, 5);
+
+    this._camera = new CanvasCamera(1, 10);
   }
 
   public get size() {
     return this._size;
+  }
+
+  public get textureSize() {
+    return this._texturesSize;
+  }
+
+  public get canvasSize() {
+    return this._size * this._texturesSize;
   }
 
   public get continents() {
@@ -31,15 +46,44 @@ export class GlobalMap {
     return Array.from(this._tiles.values());
   }
 
-  public get mapScale() {
-    return this._mapScale;
+  public get camera() {
+    return this._camera;
+  }
+
+  public set selectedPoint(canvasPoint: Point | null) {
+    console.log('canvasPoint = ', canvasPoint);
+    console.log('scale = ', this.camera.scale);
+    console.log('translation = ', this.camera.translation);
+
+    const mapPoint = new Point(
+      Math.trunc(canvasPoint!.x / this.textureSize),
+      Math.trunc(canvasPoint!.y / this.textureSize),
+    );
+
+    console.log('mapPoint = ', mapPoint);
+
+    this._selectedPoint = this.isCorrectPoint(mapPoint) ? mapPoint : null;
+    this._selectedTile = this.isCorrectPoint(mapPoint) ? this.getTile(mapPoint) || null : null;
+
+    console.log('selectedTile = ', this._selectedTile);
+    console.log('');
+  }
+
+  public get selectedPoint() {
+    return this._selectedPoint;
+  }
+
+  public get selectedTile() {
+    return this._selectedTile;
   }
 
   public isCorrectCoordinate(coordinate: number): boolean {
     return coordinate > -1 && coordinate < this._size;
   }
 
-  public isCorrectPoint(point: Point): boolean {
+  public isCorrectPoint(point: Point | null): boolean {
+    if (!point) return false;
+
     return this.isCorrectCoordinate(point.x) && this.isCorrectCoordinate(point.y);
   }
 
@@ -49,7 +93,9 @@ export class GlobalMap {
     }
   }
 
-  public getTile(point: Point): GlobalMapTile | undefined {
+  public getTile(point: Point | null): GlobalMapTile | undefined {
+    if (!point) return undefined;
+
     if (this.isCorrectPoint(point)) {
       return this._tiles.get(point.toStringKey());
     } else {

@@ -3,12 +3,13 @@
     <div class="global-map">
       <canvas
         #gameGlobalMap
-        [width]="canvasWidth()"
-        [height]="canvasHeight()"
+        [width]="canvasSize"
+        [height]="canvasSize"
         (wheel)="onCanvasWheel($event)"
         draggable="true"
         (dragstart)="onCanvasDragStart($event)"
         (dragend)="onCanvasDragEnd($event)"
+        (click)="onClick($event)"
       >
       </canvas>
     </div>

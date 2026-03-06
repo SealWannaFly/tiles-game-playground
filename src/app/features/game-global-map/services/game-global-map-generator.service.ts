@@ -18,8 +18,8 @@ export class GameGlobalMapGeneratorService {
 
   constructor(private readonly seedService: SeedService) {}
 
-  public generateGlobalMap(size: number): GlobalMap {
-    const globalMap = new GlobalMap(size);
+  public generateGlobalMap(size: number, texturesSize: number): GlobalMap {
+    const globalMap = new GlobalMap(size, texturesSize);
 
     this.generateOcean(globalMap);
     this.generateContinents(globalMap);
