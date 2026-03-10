@@ -20,4 +20,8 @@ export class Point {
   public toStringKey(): string {
     return `${this.x}:${this.y}`;
   }
+
+  public static sum(a: Point, b: Point): Point {
+    return new Point(a.x + b.x, a.y + b.y);
+  }
 }

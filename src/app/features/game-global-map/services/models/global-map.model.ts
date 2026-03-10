@@ -51,22 +51,21 @@ export class GlobalMap {
   }
 
   public set selectedPoint(canvasPoint: Point | null) {
-    console.log('canvasPoint = ', canvasPoint);
-    console.log('scale = ', this.camera.scale);
-    console.log('translation = ', this.camera.translation);
-
     const mapPoint = new Point(
-      Math.trunc(canvasPoint!.x / this.textureSize),
-      Math.trunc(canvasPoint!.y / this.textureSize),
+      Math.trunc(
+        (canvasPoint!.x - this.camera.translation.x * this.camera.scale) /
+          this.camera.scale /
+          this.textureSize,
+      ),
+      Math.trunc(
+        (canvasPoint!.y - this.camera.translation.y * this.camera.scale) /
+          this.camera.scale /
+          this.textureSize,
+      ),
     );
-
-    console.log('mapPoint = ', mapPoint);
 
     this._selectedPoint = this.isCorrectPoint(mapPoint) ? mapPoint : null;
     this._selectedTile = this.isCorrectPoint(mapPoint) ? this.getTile(mapPoint) || null : null;
-
-    console.log('selectedTile = ', this._selectedTile);
-    console.log('');
   }
 
   public get selectedPoint() {

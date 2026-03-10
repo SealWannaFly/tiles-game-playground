@@ -9,11 +9,12 @@ import { SpriteSheetLoaderService } from '../../common/services/game-sprite-shee
 import { SeedService } from '../../common/services/seed.service';
 import { GlobalMap } from './services/models/global-map.model';
 import { Point } from '../../common/models/point.class';
+import { JsonPipe } from '@angular/common';
 
 @Component({
   selector: 'app-game-global-map',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, JsonPipe],
   templateUrl: './game-global-map.html',
   styleUrl: './game-global-map.scss',
 })
@@ -22,6 +23,8 @@ export class GameGlobalMap extends CommonBase implements OnInit {
   private _globalMap: GlobalMap;
 
   public canvasSize: number;
+
+  selectedTile: GlobalMapTile | null;
 
   readonly numericSeed = this.seedService.numericSeed;
 
@@ -162,6 +165,8 @@ export class GameGlobalMap extends CommonBase implements OnInit {
     this._globalMap.selectedPoint = this.clientToCanvasPoint(
       new Point(pointerEvent.clientX, pointerEvent.clientY),
     );
+
+    this.selectedTile = this._globalMap.selectedTile;
 
     this.drawMap();
   }

@@ -1,6 +1,6 @@
 <div class="grid grid-gap-24">
   <div class="col-4">
-    <div class="global-map">
+    <div class="global-map flex justify-around">
       <canvas
         #gameGlobalMap
         [width]="canvasSize"
@@ -34,5 +34,8 @@
       <button type="submit">Сгенерировать</button>
     </form>
     <button class="mt-24" (click)="drawMap()">Нарисовать</button>
+    <div class="mt-24">
+      Selected Tile = {{ selectedTile | json }}
+    </div>
   </div>
 </div>
