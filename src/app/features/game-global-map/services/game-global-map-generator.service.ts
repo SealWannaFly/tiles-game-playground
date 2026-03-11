@@ -23,6 +23,7 @@ export class GameGlobalMapGeneratorService {
 
     this.generateOcean(globalMap);
     this.generateContinents(globalMap);
+    this.indexingTiles(globalMap);
 
     return globalMap;
   }
@@ -141,8 +142,12 @@ export class GameGlobalMapGeneratorService {
       }
     }
 
-    console.log('Generated continents = ', map.continents.length);
-
     this._mapGenStage.set(GlobalMapGenerationStages.CONTINENTS_GENERATED);
+  }
+
+  private indexingTiles(map: GlobalMap): void {
+    this._mapGenStage.set(GlobalMapGenerationStages.TILES_INDEXING);
+
+    this._mapGenStage.set(GlobalMapGenerationStages.TILES_INDEXED);
   }
 }

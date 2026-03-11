@@ -38,6 +38,150 @@
           "width": 64,
           "height": 64
         }
+      },
+      {
+        "key": "Shallow Water with Flat Land (NW)",
+        "region": {
+          "x": 1,
+          "y": 131,
+          "width": 64,
+          "height": 64
+        }
+      },
+      {
+        "key": "Shallow Water with Flat Land (N)",
+        "region": {
+          "x": 66,
+          "y": 131,
+          "width": 64,
+          "height": 64
+        }
+      },
+      {
+        "key": "Shallow Water with Flat Land (NE)",
+        "region": {
+          "x": 131,
+          "y": 131,
+          "width": 64,
+          "height": 64
+        }
+      },
+      {
+        "key": "Shallow Water with Flat Land (E)",
+        "region": {
+          "x": 131,
+          "y": 196,
+          "width": 64,
+          "height": 64
+        }
+      },
+      {
+        "key": "Shallow Water with Flat Land (SE)",
+        "region": {
+          "x": 131,
+          "y": 261,
+          "width": 64,
+          "height": 64
+        }
+      },
+      {
+        "key": "Shallow Water with Flat Land (S)",
+        "region": {
+          "x": 66,
+          "y": 261,
+          "width": 64,
+          "height": 64
+        }
+      },
+      {
+        "key": "Shallow Water with Flat Land (SW)",
+        "region": {
+          "x": 1,
+          "y": 261,
+          "width": 64,
+          "height": 64
+        }
+      },
+      {
+        "key": "Shallow Water with Flat Land (W)",
+        "region": {
+          "x": 1,
+          "y": 196,
+          "width": 64,
+          "height": 64
+        }
+      },
+      {
+        "key": "Flat Land with Shallow Water (NW)",
+        "region": {
+          "x": 196,
+          "y": 131,
+          "width": 64,
+          "height": 64
+        }
+      },
+      {
+        "key": "Flat Land with Shallow Water (N)",
+        "region": {
+          "x": 261,
+          "y": 131,
+          "width": 64,
+          "height": 64
+        }
+      },
+      {
+        "key": "Flat Land with Shallow Water (NE)",
+        "region": {
+          "x": 326,
+          "y": 131,
+          "width": 64,
+          "height": 64
+        }
+      },
+      {
+        "key": "Flat Land with Shallow Water (W)",
+        "region": {
+          "x": 196,
+          "y": 196,
+          "width": 64,
+          "height": 64
+        }
+      },
+      {
+        "key": "Flat Land with Shallow Water (E)",
+        "region": {
+          "x": 326,
+          "y": 196,
+          "width": 64,
+          "height": 64
+        }
+      },
+      {
+        "key": "Flat Land with Shallow Water (SW)",
+        "region": {
+          "x": 196,
+          "y": 261,
+          "width": 64,
+          "height": 64
+        }
+      },
+      {
+        "key": "Flat Land with Shallow Water (S)",
+        "region": {
+          "x": 261,
+          "y": 261,
+          "width": 64,
+          "height": 64
+        }
+      },
+      {
+        "key": "Flat Land with Shallow Water (SE)",
+        "region": {
+          "x": 326,
+          "y": 261,
+          "width": 64,
+          "height": 64
+        }
       }
     ]
   }
