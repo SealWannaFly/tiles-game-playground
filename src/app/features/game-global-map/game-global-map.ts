@@ -4,12 +4,17 @@ import { GameConfigsLoaderService } from '../../common/services/game-configs-loa
 import { CommonBase } from '../../common/base/common.base';
 import { GameGlobalMapGeneratorService } from './services/game-global-map-generator.service';
 import { takeUntil } from 'rxjs';
-import { GlobalMapTile } from './services/interfaces/global-map-tile.interface';
+import { GlobalMapTile } from './services/models/global-map-tile.class';
 import { SpriteSheetLoaderService } from '../../common/services/game-sprite-sheet-loader/sprite-sheet-loader.service';
 import { SeedService } from '../../common/services/seed.service';
 import { GlobalMap } from './services/models/global-map.model';
 import { Point } from '../../common/models/point.class';
 import { JsonPipe } from '@angular/common';
+import {
+  AdjacentTileSprite,
+  TileSpriteKey,
+} from '../../common/services/game-sprite-sheet-loader/classes/tile-sprite-key.class';
+import { MapDirection } from '../../common/enums/map-direction.enum';
 
 @Component({
   selector: 'app-game-global-map',
@@ -88,41 +93,60 @@ export class GameGlobalMap extends CommonBase implements OnInit {
   }
 
   private drawTile(ctx: CanvasRenderingContext2D, tile: GlobalMapTile, tileSize: number): void {
-    const spriteSheet = this.spriteSheetLoaderService.getSpriteSheet('Terrain');
+    const adjacentTiles: AdjacentTileSprite[] = [];
 
-    if (spriteSheet) {
-      const sprite = spriteSheet.getSprite(tile.terrain);
+    this._globalMap.processTilesByDirection(tile.point, 1, (point, direction) => {
+      const tileTerrain = this._globalMap.getTile(point)?.terrain;
 
-      if (sprite) {
-        ctx.drawImage(
-          sprite.image,
-          sprite.region.x,
-          sprite.region.y,
-          sprite.region.width,
-          sprite.region.height,
-          tile.point.x * tileSize,
-          tile.point.y * tileSize,
-          tileSize,
-          tileSize,
+      if (tileTerrain && tileTerrain !== tile.terrain) {
+        let adjacent = adjacentTiles.find((v) => v.key === tileTerrain);
+
+        if (!adjacent) {
+          adjacent = {
+            key: tileTerrain,
+            connections: new Map<MapDirection, boolean>(),
+          };
+
+          adjacentTiles.push(adjacent);
+        }
+
+        adjacent.connections.set(direction, true);
+      }
+    });
+
+    const tileSpriteKey = new TileSpriteKey(tile.terrain, adjacentTiles);
+
+    const sprite = this.spriteSheetLoaderService.getSprite(tileSpriteKey);
+
+    if (sprite) {
+      ctx.drawImage(
+        sprite.image,
+        sprite.region.x,
+        sprite.region.y,
+        sprite.region.width,
+        sprite.region.height,
+        tile.point.x * tileSize,
+        tile.point.y * tileSize,
+        tileSize,
+        tileSize,
+      );
+
+      if (tile === this._globalMap.selectedTile) {
+        ctx.save();
+
+        const lineWidth = Math.trunc(this._globalMap.textureSize / 10);
+
+        ctx.strokeStyle = 'black';
+        ctx.lineWidth = lineWidth;
+
+        ctx.strokeRect(
+          tile.point.x * tileSize + lineWidth / 2,
+          tile.point.y * tileSize + lineWidth / 2,
+          tileSize - lineWidth,
+          tileSize - lineWidth,
         );
 
-        if (tile === this._globalMap.selectedTile) {
-          ctx.save();
-
-          const lineWidth = Math.trunc(this._globalMap.textureSize / 10);
-
-          ctx.strokeStyle = 'black';
-          ctx.lineWidth = lineWidth;
-
-          ctx.strokeRect(
-            tile.point.x * tileSize + lineWidth / 2,
-            tile.point.y * tileSize + lineWidth / 2,
-            tileSize - lineWidth,
-            tileSize - lineWidth,
-          );
-
-          ctx.restore();
-        }
+        ctx.restore();
       }
     }
   }
@@ -177,6 +201,15 @@ export class GameGlobalMap extends CommonBase implements OnInit {
     return new Point(
       Math.trunc(((point.x - rect.left) / rect.width) * this._globalMap.canvasSize),
       Math.trunc(((point.y - rect.top) / rect.height) * this._globalMap.canvasSize),
+    );
+  }
+
+  logUnknownSprites() {
+    console.log(
+      'unknownSprites = ',
+      Array.from(this.spriteSheetLoaderService.unknownSprites).filter((us: string) =>
+        us.includes('Flat Land|Shallow Water|'),
+      ),
     );
   }
 }

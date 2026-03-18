@@ -33,7 +33,12 @@
 
       <button type="submit">Сгенерировать</button>
     </form>
-    <button class="mt-24" (click)="drawMap()">Нарисовать</button>
+    <div class="mt-24">
+      <button class="mt-24" (click)="drawMap()">Нарисовать</button>
+    </div>
+    <div class="mt-24">
+      <button class="mt-24" (click)="logUnknownSprites()">Вывести список неизвестных тайлов</button>
+    </div>
     <div class="mt-24">
       Selected Tile = {{ selectedTile | json }}
     </div>

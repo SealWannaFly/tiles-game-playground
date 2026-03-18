@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { GlobalMapTile } from './interfaces/global-map-tile.interface';
+import { GlobalMapTile } from './models/global-map-tile.class';
 import { GlobalMapTerrains } from './enums/global-map-terrains.enum';
 import { GlobalMapGenerationStages } from './enums/global-map-generation-stages.enum';
 import { SeedService } from '../../../common/services/seed.service';

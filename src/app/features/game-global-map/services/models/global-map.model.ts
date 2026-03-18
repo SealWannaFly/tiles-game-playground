@@ -1,8 +1,9 @@
-import { GlobalMapTile } from '../interfaces/global-map-tile.interface';
+import { GlobalMapTile } from './global-map-tile.class';
 import { ContinentInfo } from './continent-info.model';
 import { Point } from '../../../../common/models/point.class';
 import { GlobalMapTerrains } from '../enums/global-map-terrains.enum';
 import { CanvasCamera } from '../../../../common/models/canvas-camera.class';
+import { MAP_DIRECTION_ORDER, MapDirection } from '../../../../common/enums/map-direction.enum';
 
 export class GlobalMap {
   private readonly _size: number;
@@ -133,6 +134,50 @@ export class GlobalMap {
 
         if (this.isCorrectPoint(neighborPoint)) {
           callback(neighborPoint);
+        }
+      }
+    }
+  };
+
+  public processTilesByDirection = (
+    point: Point,
+    radius: number,
+    callback: (point: Point, direction: MapDirection) => any,
+  ) => {
+    // Обходим все направления по порядку
+    for (const direction of MAP_DIRECTION_ORDER) {
+      for (let step = 1; step <= radius; step++) {
+        let neighborPoint: Point;
+
+        switch (direction) {
+          case MapDirection.N:
+            neighborPoint = new Point(point.x, point.y - step);
+            break;
+          case MapDirection.NE:
+            neighborPoint = new Point(point.x + step, point.y - step);
+            break;
+          case MapDirection.E:
+            neighborPoint = new Point(point.x + step, point.y);
+            break;
+          case MapDirection.SE:
+            neighborPoint = new Point(point.x + step, point.y + step);
+            break;
+          case MapDirection.S:
+            neighborPoint = new Point(point.x, point.y + step);
+            break;
+          case MapDirection.SW:
+            neighborPoint = new Point(point.x - step, point.y + step);
+            break;
+          case MapDirection.W:
+            neighborPoint = new Point(point.x - step, point.y);
+            break;
+          case MapDirection.NW:
+            neighborPoint = new Point(point.x - step, point.y - step);
+            break;
+        }
+
+        if (this.isCorrectPoint(neighborPoint)) {
+          callback(neighborPoint, direction);
         }
       }
     }

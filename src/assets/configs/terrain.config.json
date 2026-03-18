@@ -1,188 +1,985 @@
 {
-  "spriteSheetConfig": {
-    "key": "Terrain",
-    "url": "/assets/terrain/terrain.png",
-    "sprites": [
-      {
-        "key": "Shallow Water",
-        "region": {
-          "x": 1,
-          "y": 1,
-          "width": 64,
-          "height": 64
-        }
-      },
-      {
-        "key": "Intermediate Water",
-        "region": {
-          "x": 66,
-          "y": 1,
-          "width": 64,
-          "height": 64
-        }
-      },
-      {
-        "key": "Deep Water",
-        "region": {
-          "x": 131,
-          "y": 1,
-          "width": 64,
-          "height": 64
-        }
-      },
-      {
-        "key": "Flat Land",
-        "region": {
-          "x": 1,
-          "y": 66,
-          "width": 64,
-          "height": 64
-        }
-      },
-      {
-        "key": "Shallow Water with Flat Land (NW)",
-        "region": {
-          "x": 1,
-          "y": 131,
-          "width": 64,
-          "height": 64
-        }
-      },
-      {
-        "key": "Shallow Water with Flat Land (N)",
-        "region": {
-          "x": 66,
-          "y": 131,
-          "width": 64,
-          "height": 64
-        }
-      },
-      {
-        "key": "Shallow Water with Flat Land (NE)",
-        "region": {
-          "x": 131,
-          "y": 131,
-          "width": 64,
-          "height": 64
-        }
-      },
-      {
-        "key": "Shallow Water with Flat Land (E)",
-        "region": {
-          "x": 131,
-          "y": 196,
-          "width": 64,
-          "height": 64
-        }
-      },
-      {
-        "key": "Shallow Water with Flat Land (SE)",
-        "region": {
-          "x": 131,
-          "y": 261,
-          "width": 64,
-          "height": 64
-        }
-      },
-      {
-        "key": "Shallow Water with Flat Land (S)",
-        "region": {
-          "x": 66,
-          "y": 261,
-          "width": 64,
-          "height": 64
-        }
-      },
-      {
-        "key": "Shallow Water with Flat Land (SW)",
-        "region": {
-          "x": 1,
-          "y": 261,
-          "width": 64,
-          "height": 64
-        }
-      },
-      {
-        "key": "Shallow Water with Flat Land (W)",
-        "region": {
-          "x": 1,
-          "y": 196,
-          "width": 64,
-          "height": 64
-        }
-      },
-      {
-        "key": "Flat Land with Shallow Water (NW)",
-        "region": {
-          "x": 196,
-          "y": 131,
-          "width": 64,
-          "height": 64
-        }
-      },
-      {
-        "key": "Flat Land with Shallow Water (N)",
-        "region": {
-          "x": 261,
-          "y": 131,
-          "width": 64,
-          "height": 64
-        }
-      },
-      {
-        "key": "Flat Land with Shallow Water (NE)",
-        "region": {
-          "x": 326,
-          "y": 131,
-          "width": 64,
-          "height": 64
-        }
-      },
-      {
-        "key": "Flat Land with Shallow Water (W)",
-        "region": {
-          "x": 196,
-          "y": 196,
-          "width": 64,
-          "height": 64
-        }
-      },
-      {
-        "key": "Flat Land with Shallow Water (E)",
-        "region": {
-          "x": 326,
-          "y": 196,
-          "width": 64,
-          "height": 64
-        }
-      },
-      {
-        "key": "Flat Land with Shallow Water (SW)",
-        "region": {
-          "x": 196,
-          "y": 261,
-          "width": 64,
-          "height": 64
-        }
-      },
-      {
-        "key": "Flat Land with Shallow Water (S)",
-        "region": {
-          "x": 261,
-          "y": 261,
-          "width": 64,
-          "height": 64
-        }
-      },
-      {
-        "key": "Flat Land with Shallow Water (SE)",
-        "region": {
-          "x": 326,
-          "y": 261,
-          "width": 64,
-          "height": 64
-        }
+  "key": "Terrain",
+  "url": "/assets/terrain/terrain.png",
+  "sprites": [
+    {
+      "key": "Shallow Water",
+      "region": {
+        "x": 1,
+        "y": 1,
+        "width": 64,
+        "height": 64
       }
-    ]
-  }
+    },
+    {
+      "key": "Intermediate Water",
+      "region": {
+        "x": 66,
+        "y": 1,
+        "width": 64,
+        "height": 64
+      }
+    },
+    {
+      "key": "Deep Water",
+      "region": {
+        "x": 131,
+        "y": 1,
+        "width": 64,
+        "height": 64
+      }
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 1,
+        "y": 66,
+        "width": 64,
+        "height": 64
+      }
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 66,
+        "y": 66,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "NW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 131,
+        "y": 66,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "NE": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 196,
+        "y": 66,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "NE": true,
+            "NW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 261,
+        "y": 66,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "SE": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 326,
+        "y": 66,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "SE": true,
+            "NW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 391,
+        "y": 66,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "NE": true,
+            "SE": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 456,
+        "y": 66,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "NE": true,
+            "SE": true,
+            "NW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 1,
+        "y": 131,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "SW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 66,
+        "y": 131,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "SW": true,
+            "NW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 131,
+        "y": 131,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "NE": true,
+            "SW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 196,
+        "y": 131,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "NE": true,
+            "NW": true,
+            "SW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 261,
+        "y": 131,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "SE": true,
+            "SW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 326,
+        "y": 131,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "SE": true,
+            "SW": true,
+            "NW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 391,
+        "y": 131,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "NE": true,
+            "SE": true,
+            "SW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 456,
+        "y": 131,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "NE": true,
+            "SE": true,
+            "SW": true,
+            "NW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 1,
+        "y": 196,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "SW": true,
+            "W": true,
+            "NW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 1,
+        "y": 196,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "SW": true,
+            "W": true,
+            "NW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 66,
+        "y": 196,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "NE": true,
+            "SW": true,
+            "W": true,
+            "NW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 131,
+        "y": 196,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "SE": true,
+            "SW": true,
+            "W": true,
+            "NW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 196,
+        "y": 196,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "NE": true,
+            "SE": true,
+            "SW": true,
+            "W": true,
+            "NW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 261,
+        "y": 196,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "N": true,
+            "NE": true,
+            "NW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 326,
+        "y": 196,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "N": true,
+            "NE": true,
+            "SE": true,
+            "NW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 391,
+        "y": 196,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "N": true,
+            "NE": true,
+            "SW": true,
+            "NW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 456,
+        "y": 196,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "N": true,
+            "NE": true,
+            "SE": true,
+            "SW": true,
+            "NW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 1,
+        "y": 261,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "NE": true,
+            "E": true,
+            "SE": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 66,
+        "y": 261,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "NE": true,
+            "E": true,
+            "SE": true,
+            "SW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 131,
+        "y": 261,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "NE": true,
+            "E": true,
+            "SE": true,
+            "NW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 196,
+        "y": 261,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "NE": true,
+            "E": true,
+            "SE": true,
+            "SW": true,
+            "NW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 261,
+        "y": 261,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "SE": true,
+            "S": true,
+            "SW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 326,
+        "y": 261,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "SE": true,
+            "S": true,
+            "SW": true,
+            "NW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 391,
+        "y": 261,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "NE": true,
+            "SE": true,
+            "S": true,
+            "SW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 456,
+        "y": 261,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "NE": true,
+            "SE": true,
+            "S": true,
+            "SW": true,
+            "NW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 1,
+        "y": 326,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "NE": true,
+            "E": true,
+            "SE": true,
+            "SW": true,
+            "W": true,
+            "NW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 66,
+        "y": 326,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "N": true,
+            "NE": true,
+            "SE": true,
+            "S": true,
+            "SW": true,
+            "NW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 131,
+        "y": 326,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "N": true,
+            "NE": true,
+            "SW": true,
+            "W": true,
+            "NW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 196,
+        "y": 326,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "N": true,
+            "NE": true,
+            "SE": true,
+            "SW": true,
+            "W": true,
+            "NW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 261,
+        "y": 326,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "N": true,
+            "NE": true,
+            "E": true,
+            "SE": true,
+            "NW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 326,
+        "y": 326,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "N": true,
+            "NE": true,
+            "E": true,
+            "SE": true,
+            "SW": true,
+            "NW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 391,
+        "y": 326,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "NE": true,
+            "E": true,
+            "SE": true,
+            "S": true,
+            "SW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 456,
+        "y": 326,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "NE": true,
+            "E": true,
+            "SE": true,
+            "S": true,
+            "SW": true,
+            "NW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 1,
+        "y": 391,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "SE": true,
+            "S": true,
+            "SW": true,
+            "W": true,
+            "NW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 66,
+        "y": 391,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "NE": true,
+            "SE": true,
+            "S": true,
+            "SW": true,
+            "W": true,
+            "NW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 131,
+        "y": 391,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "N": true,
+            "NE": true,
+            "E": true,
+            "SE": true,
+            "SW": true,
+            "W": true,
+            "NW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 196,
+        "y": 391,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "N": true,
+            "NE": true,
+            "SE": true,
+            "S": true,
+            "SW": true,
+            "W": true,
+            "NW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 261,
+        "y": 391,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "NE": true,
+            "E": true,
+            "SE": true,
+            "S": true,
+            "SW": true,
+            "W": true,
+            "NW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 326,
+        "y": 391,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "N": true,
+            "NE": true,
+            "E": true,
+            "SE": true,
+            "S": true,
+            "SW": true,
+            "NW": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "Flat Land",
+      "region": {
+        "x": 391,
+        "y": 391,
+        "width": 64,
+        "height": 64
+      },
+      "adjacent": [
+        {
+          "key": "Shallow Water",
+          "connections": {
+            "N": true,
+            "NE": true,
+            "E": true,
+            "SE": true,
+            "S": true,
+            "SW": true,
+            "W": true,
+            "NW": true
+          }
+        }
+      ]
+    }
+  ]
 }
